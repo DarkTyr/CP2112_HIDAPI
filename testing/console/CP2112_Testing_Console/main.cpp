@@ -1,15 +1,19 @@
 #include <QCoreApplication>
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 
 /// need for sleep functionality
 #include <Windows.h>
 
+
+#include "../../../include/cp2112_hidapi.h"
 #include "../../../include/hidapi.h"
 //#include "hidapi.h"
 
 int main(int argc, char *argv[])
 {
+
     QCoreApplication a(argc, argv);
 
     // Buffer to hold information  being sent on the USB bus
@@ -87,7 +91,7 @@ int main(int argc, char *argv[])
         printf("SMBus config sent to CP2112\n");
         printf("Bytes sent: %d \n",status - 1);
     }
-    /*
+
     /// Set GPIO values on CP2112
     printf("***Set GPIO values\n");
     buffer[0] = 0x04;   // Set GPIO values
@@ -216,7 +220,7 @@ int main(int argc, char *argv[])
     }
     printf("waiting for 1 second\n");
     Sleep(1000);
-*/
+
     /// Send Data Write Read Request
     printf("***Send Data Read request***\n");
     buffer[0] = 0x11;   // Data Write Read Request
@@ -238,7 +242,7 @@ int main(int argc, char *argv[])
         printf("succeded in Data Write Read Request\n");
         printf("Bytes sent: %d \n",status - 1);
     }
-    Sleep(1500);
+    Sleep(100);
     /// Read What was Read
     printf("***Read what was read before request***\n");
     status = hid_read_timeout(device, buffer, 63, 1000);
@@ -300,8 +304,21 @@ int main(int argc, char *argv[])
         printf("Buffer[5]: %02hX\n", buffer[5]);
         printf("Buffer[6]: %02hX\n", buffer[6]);
     }
-
     hid_close(device);
+    CP2112_HIDAPI *emu = new CP2112_HIDAPI;
+    emu->open_device(0x10C4, 0xEA90);
+    buffer[0] = 0x00;
+    buffer[1] = 0x01;
+    status = emu->i2c_write(0xA4, 2, buffer);
+    printf("CP2112_HIDAPI status:%d", status);
+    buffer[0] = 0x3B;
+    buffer[1] = 0x7F;
+    buffer[2] = 0xFF;
+    status = emu->i2c_write(0xA4, 2, buffer);
+    printf("CP2112_HIDAPI status:%d", status);
+
+
+
     printf("device closed\n");
 
 

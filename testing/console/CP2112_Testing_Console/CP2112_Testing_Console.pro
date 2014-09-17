@@ -5,7 +5,6 @@
 #-------------------------------------------------
 
 QT       += core
-
 QT       -= gui
 
 TARGET = CP2112_Testing_Console
@@ -16,10 +15,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    ../../../src/windows/hid.c
+    ../../../src/windows/hid.c \
+    ../../../src/cp2112_hidapi.cpp
 
 HEADERS += \
-    ../../../include/hidapi.h
+    ../../../include/hidapi.h \
+    ../../../include/cp2112_hidapi.h
 
 #-------------------------------------------------
 # HID API Requirements to compile in Qt
