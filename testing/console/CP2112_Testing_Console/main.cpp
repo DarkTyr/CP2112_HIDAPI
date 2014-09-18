@@ -305,18 +305,6 @@ int main(int argc, char *argv[])
         printf("Buffer[6]: %02hX\n", buffer[6]);
     }
     hid_close(device);
-    CP2112_HIDAPI *emu = new CP2112_HIDAPI;
-    emu->open_device(0x10C4, 0xEA90);
-    buffer[0] = 0x00;
-    buffer[1] = 0x01;
-    status = emu->i2c_write(0xA4, 2, buffer);
-    printf("CP2112_HIDAPI status:%d", status);
-    buffer[0] = 0x3B;
-    buffer[1] = 0x7F;
-    buffer[2] = 0xFF;
-    status = emu->i2c_write(0xA4, 2, buffer);
-    printf("CP2112_HIDAPI status:%d", status);
-
 
 
     printf("device closed\n");
