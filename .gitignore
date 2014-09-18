@@ -34,3 +34,9 @@ testing/console/CP2112_Testing_Console/Qt_5_3_MSVC2013_OpenGL_32bit/Makefile.Rel
 testing/console/CP2112_Testing_Console/Qt_5_3_MSVC2013_OpenGL_64bit/Makefile
 testing/console/CP2112_Testing_Console/Qt_5_3_MSVC2013_OpenGL_64bit/Makefile.Debug
 testing/console/CP2112_Testing_Console/Qt_5_3_MSVC2013_OpenGL_64bit/Makefile.Release
+.autosave
+*.autosave
+*Makefile
+*Makefile.Debug
+*Makefile.Release
+*.pro.user
