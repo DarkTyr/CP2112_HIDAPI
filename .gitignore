@@ -36,3 +36,5 @@ testing/console/CP2112_Testing_Console/Qt_5_3_MSVC2013_OpenGL_64bit/Makefile.Deb
 testing/console/CP2112_Testing_Console/Qt_5_3_MSVC2013_OpenGL_64bit/Makefile.Release
 *.pro.user
 *Makefile*
+*.pro.user
+testing/console/CP2112_Testing_Console/CP2112_Testing_Console.pro.user
