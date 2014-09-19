@@ -217,6 +217,7 @@ int main(int argc, char *argv[])
         printf("Buffer[4]: %02hX\n", buffer[4]);
         printf("Buffer[5]: %02hX\n", buffer[5]);
         printf("Buffer[6]: %02hX\n", buffer[6]);
+        printf("Buffer[7]: %02hX\n", buffer[7]);
     }
     printf("waiting for 1 second\n");
     Sleep(1000);
@@ -226,9 +227,9 @@ int main(int argc, char *argv[])
     buffer[0] = 0x11;   // Data Write Read Request
     buffer[1] = 0xA4;   // MAXIM IC Fan Controller Address
     buffer[2] = 0x00;   // Number of bytes to read back
-    buffer[3] = 0x08;
-    buffer[4] = 0x01;   // Number of byets to send to target
-    buffer[5] = 0x9D;   //Data to send
+    buffer[3] = 0x02;
+    buffer[4] = 0x01;   // Number of bytes to send to target
+    buffer[5] = 0x90;   //Data to send
     buffer[6] = 0x00;
     buffer[7] = 0x00;
     status = hid_write(device, buffer, 6);
@@ -253,17 +254,24 @@ int main(int argc, char *argv[])
     }
     else
     {
-        printf("got status\n");
-        printf("Bytes recieved: %d \n",status - 1);
-        printf("Buffer[0]: %02hX\n", buffer[0]);
-        printf("Buffer[1]: %02hX\n", buffer[1]);
-        printf("Buffer[2]: %02hX\n", buffer[2]);
-        printf("Buffer[3]: %02hX\n", buffer[3]);
-        printf("Buffer[4]: %02hX\n", buffer[4]);
-        printf("Buffer[5]: %02hX\n", buffer[5]);
-        printf("Buffer[6]: %02hX\n", buffer[6]);
-        printf("Buffer[7]: %02hX\n", buffer[7]);
-        printf("Buffer[8]: %02hX\n", buffer[8]);
+        if (status == 0)
+        {
+            printf("CP2112 did not send any data back\n");
+        }
+        else
+        {
+            printf("got status\n");
+            printf("Bytes recieved: %d \n",status - 1);
+            printf("Buffer[0]: %02hX\n", buffer[0]);
+            printf("Buffer[1]: %02hX\n", buffer[1]);
+            printf("Buffer[2]: %02hX\n", buffer[2]);
+            printf("Buffer[3]: %02hX\n", buffer[3]);
+            printf("Buffer[4]: %02hX\n", buffer[4]);
+            printf("Buffer[5]: %02hX\n", buffer[5]);
+            printf("Buffer[6]: %02hX\n", buffer[6]);
+            printf("Buffer[7]: %02hX\n", buffer[7]);
+            printf("Buffer[8]: %02hX\n", buffer[8]);
+        }
     }
 
 
@@ -285,8 +293,8 @@ int main(int argc, char *argv[])
     }
     /// Read Transfer Status Report about the SMBus data writen
     printf("***Read Transfer status request***\n");
-    buffer[0] = 0x13;   //Get GPIO status
-    status = hid_read_timeout(device, buffer, 7, 1000);
+    //buffer[0] = 0x13;   //Get GPIO status
+    status = hid_read_timeout(device, buffer, 5, 1000);
     if(status == -1)
     {
         printf("failed to read status request\n");
@@ -303,6 +311,7 @@ int main(int argc, char *argv[])
         printf("Buffer[4]: %02hX\n", buffer[4]);
         printf("Buffer[5]: %02hX\n", buffer[5]);
         printf("Buffer[6]: %02hX\n", buffer[6]);
+        printf("Buffer[7]: %02hX\n", buffer[7]);
     }
     hid_close(device);
 
