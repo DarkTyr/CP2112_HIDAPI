@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
 
     cout <<"***Enumerate all devices with VID 0x10C4***\n";
-    devs = hid_enumerate(0x0, 0x0);
+    devs = hid_enumerate(0x10C4, 0x0);
     //devs = hid_enumerate(0x10C4, 0x0);
     cur_dev = devs;
     while (cur_dev)
@@ -63,14 +63,8 @@ int main(int argc, char *argv[])
     status = EMU->i2c_write(0xA4, 2, buffer);
     cout << "EMU i2c_write result        : " << status << endl;
 
-    buffer[0] = 0x3B;
-    buffer[1] = 0xFF;
-    buffer[2] = 0x7F;
-    status = EMU->i2c_write(0XA4, 3, buffer);
-    cout << "EMU i2c_write result        : " << status << endl;
-
-    buffer[0] = 0x00;
-    status = EMU->i2c_write_read(0xA4, 1, 1, buffer);
+    buffer[0] = 0x9D;
+    status = EMU->i2c_write_read(0xA4, 0x01, 0x08, buffer);
     cout << "EMU i2c_write_read result        : " << status << endl;
     printf("Buffer[0]: %02hX\n", buffer[0]);
     printf("Buffer[1]: %02hX\n", buffer[1]);

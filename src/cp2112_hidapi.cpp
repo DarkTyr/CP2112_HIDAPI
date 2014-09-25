@@ -1,7 +1,7 @@
 #include "../include/cp2112_hidapi.h"
 #include <Windows.h>
 
-enum reportsID
+enum reportID
 {
     //Feature Request
     RESET_DEVICE        = 0x01,
@@ -187,6 +187,8 @@ int CP2112_HIDAPI::i2c_read(uint8 i2cAddress, uint8 bytesToRecieve, uint8 *data)
 
 int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 bytesToRecieve, uint8 *data)
 {
+    uint8 i;
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
     /// Send Data Write Read Request
     //printf("***Send Data Read request***\n");
     buffer[0] = DATA_WRITE_READ;
@@ -195,6 +197,11 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
     buffer[3] = 0x00;
     buffer[4] = bytesToSend;        // Number of byets to send to target
     buffer[5] = *data;
+
+    for(i = 0; i < bytesToSend; i++)
+    {
+        buffer[5 + i] = data[i];
+    }
 
     hidStatus = hid_write(device, buffer, 5 + bytesToSend);
     if(hidStatus == -1)
@@ -211,7 +218,7 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
     i2cStatus = 0x01;
     while(i2cStatus == 0x01)
     {
-        Sleep(25);
+        //Sleep(25);
         // Send Transfer Status request
         buffer[0] = 0x15;   // Transfer Status request
         buffer[1] = 0x01;   //Request SMBus Transfer Status
@@ -249,34 +256,49 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
 
         }
     }
-    buffer[0] = DATA_READ_FORCE;
-    buffer[1] = 0xFF;
-    hidStatus = hid_write(device, buffer, 2);
-    /// Read What was Read
-    //printf("***Read what was read before request***\n");
-    hidStatus = hid_read_timeout(device, buffer, 63, 100);
-    if(hidStatus == -1)
-    {
-        printf("failed to read Data Read Request\n");
-        //string = hid_error(device);
-    }
-    else
-    {
 
-        printf("got status\n");
-        printf("Bytes recieved: %d \n",hidStatus - 1);
-        printf("Buffer[0]: %02hX\n", buffer[0]);
-        printf("Buffer[1]: %02hX\n", buffer[1]);
-        printf("Buffer[2]: %02hX\n", buffer[2]);
-        printf("Buffer[3]: %02hX\n", buffer[3]);
-        printf("Buffer[4]: %02hX\n", buffer[4]);
-        printf("Buffer[5]: %02hX\n", buffer[5]);
-        printf("Buffer[6]: %02hX\n", buffer[6]);
-        printf("Buffer[7]: %02hX\n", buffer[7]);
-        printf("Buffer[8]: %02hX\n", buffer[8]);
+    if(buffer[1] == 0x02)
+    {
+        memset((void*) &buffer[0], 0x00, sizeof(buffer));
+        buffer[0] = DATA_READ_FORCE;
+        buffer[1] = 0xFF;
+        hidStatus = hid_write(device, buffer, 2);
+        /// Read What was Read
+        hidStatus = hid_read_timeout(device, buffer, 63, 100);
+        if(hidStatus == -1)
+        {
+            printf("failed to read Data Read Request\n");
+            //string = hid_error(device);
+        }
+
+        for(i = 0; i < buffer[2]; i++)
+        {
+            data[i] = buffer[3 + i];
+        }
+
 
     }
-    *data = *buffer;
+
+    printf("got status\n");
+    printf("Bytes recieved: %d \n",hidStatus - 1);
+    printf("Buffer[0]: %02hX\n", buffer[0]);
+    printf("Buffer[1]: %02hX\n", buffer[1]);
+    printf("Buffer[2]: %02hX\n", buffer[2]);
+    printf("Buffer[3]: %02hX\n", buffer[3]);
+    printf("Buffer[4]: %02hX\n", buffer[4]);
+    printf("Buffer[5]: %02hX\n", buffer[5]);
+    printf("Buffer[6]: %02hX\n", buffer[6]);
+    printf("Buffer[7]: %02hX\n", buffer[7]);
+    printf("Buffer[8]: %02hX\n", buffer[8]);
+    printf("data[0]: %02hX\n", data[0]);
+    printf("data[0]: %02hX\n", data[1]);
+    printf("data[0]: %02hX\n", data[2]);
+    printf("data[0]: %02hX\n", data[3]);
+    printf("data[0]: %02hX\n", data[4]);
+    printf("data[0]: %02hX\n", data[5]);
+    printf("data[0]: %02hX\n", data[6]);
+    printf("data[0]: %02hX\n", data[7]);
+    printf("data[0]: %02hX\n", data[8]);
     return hidStatus;
 }
 
