@@ -214,36 +214,21 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
         printf("succeded in Data Write Read Request\n");
         printf("Bytes sent: %d \n",hidStatus - 1);
     }
-
-    i2cStatus = 0x01;
-    while(i2cStatus == 0x01)
+    printf("***Read what was read before request***\n");
+    hidStatus = hid_read_timeout(device, buffer, 63, 1000);
+    if(hidStatus == -1)
     {
-        //Sleep(25);
-        // Send Transfer Status request
-        buffer[0] = 0x15;   // Transfer Status request
-        buffer[1] = 0x01;   //Request SMBus Transfer Status
-        hidStatus = hid_write(device, buffer, 2);
-        if(hidStatus == -1)
+        printf("failed to read Data Read Request\n");
+        //string = hid_error(device);
+    }
+    else
+    {
+        //if (hidStatus == 0)
+        //{
+            //printf("CP2112 did not send any data back\n");
+        //}
+        //else
         {
-            printf("failed to send transfer status request \n");
-            //string = hid_error(device);
-        }
-        else
-        {
-            printf("Sent Transfer status request\n");
-            printf("Bytes sent: %d \n",hidStatus - 1);
-        }
-        // Read Transfer Status Report about the SMBus data writen
-        hidStatus = hid_read(device, buffer, 7);
-        if(hidStatus == -1)
-        {
-            printf("failed to read status request from CP2112\n");
-            //string = hid_error(device);
-        }
-        else
-        {
-            i2cStatus = buffer[1];
-
             printf("got status\n");
             printf("Bytes recieved: %d \n",hidStatus - 1);
             printf("Buffer[0]: %02hX\n", buffer[0]);
@@ -253,43 +238,71 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
             printf("Buffer[4]: %02hX\n", buffer[4]);
             printf("Buffer[5]: %02hX\n", buffer[5]);
             printf("Buffer[6]: %02hX\n", buffer[6]);
-
+            printf("Buffer[7]: %02hX\n", buffer[7]);
+            printf("Buffer[8]: %02hX\n", buffer[8]);
         }
     }
+    /// Send Transfer Status request
+    printf("***Send Transfer status request***\n");
+    buffer[0] = 0x12;   // Transfer Status request
+    buffer[1] = 0xFF;   //Request SMBus Transfer Status
+    buffer[2] = 0x00;
+    hidStatus = hid_write(device, buffer, 3);
+    if(hidStatus == -1)
+    {
+        printf("failed to send transfer status request \n");
+        //string = hid_error(device);
+    }
+    else
+    {
+        printf("Sent Transfer status request\n");
+        printf("Bytes sent: %d \n",hidStatus - 1);
+    }
+
+    /// Read Transfer Status Report about the SMBus data writen
+    printf("***Read Transfer status request***\n");
+    //buffer[0] = 0x13;   //Get SMBUS
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    hidStatus = hid_read_timeout(device, buffer, 5, 1000);
+    if(hidStatus == -1)
+    {
+        printf("failed to read status request\n");
+        //string = hid_error(device);
+    }
+    else
+    {
+        printf("got status\n");
+        printf("Bytes recieved: %d \n",hidStatus - 1);
+        printf("Buffer[0]: %02hX\n", buffer[0]);
+        printf("Buffer[1]: %02hX\n", buffer[1]);
+        printf("Buffer[2]: %02hX\n", buffer[2]);
+        printf("Buffer[3]: %02hX\n", buffer[3]);
+        printf("Buffer[4]: %02hX\n", buffer[4]);
+        printf("Buffer[5]: %02hX\n", buffer[5]);
+        printf("Buffer[6]: %02hX\n", buffer[6]);
+        printf("Buffer[7]: %02hX\n", buffer[7]);
+    }
+
+
 
     if(buffer[1] == 0x02)
     {
-        memset((void*) &buffer[0], 0x00, sizeof(buffer));
-        buffer[0] = DATA_READ_FORCE;
-        buffer[1] = 0xFF;
-        hidStatus = hid_write(device, buffer, 2);
-        /// Read What was Read
-        hidStatus = hid_read_timeout(device, buffer, 63, 100);
-        if(hidStatus == -1)
-        {
-            printf("failed to read Data Read Request\n");
-            //string = hid_error(device);
-        }
 
         for(i = 0; i < buffer[2]; i++)
         {
             data[i] = buffer[3 + i];
         }
-
-
     }
 
-    printf("got status\n");
-    printf("Bytes recieved: %d \n",hidStatus - 1);
-    printf("Buffer[0]: %02hX\n", buffer[0]);
-    printf("Buffer[1]: %02hX\n", buffer[1]);
-    printf("Buffer[2]: %02hX\n", buffer[2]);
-    printf("Buffer[3]: %02hX\n", buffer[3]);
-    printf("Buffer[4]: %02hX\n", buffer[4]);
-    printf("Buffer[5]: %02hX\n", buffer[5]);
-    printf("Buffer[6]: %02hX\n", buffer[6]);
-    printf("Buffer[7]: %02hX\n", buffer[7]);
-    printf("Buffer[8]: %02hX\n", buffer[8]);
+    if(buffer[1] == 0x00)
+    {
+
+        for(i = 0; i < buffer[2]; i++)
+        {
+            data[i] = buffer[3 + i];
+        }
+    }
+
     printf("data[0]: %02hX\n", data[0]);
     printf("data[0]: %02hX\n", data[1]);
     printf("data[0]: %02hX\n", data[2]);
