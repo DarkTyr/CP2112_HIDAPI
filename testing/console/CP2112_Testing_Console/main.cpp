@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
     buffer[3] = 0x86;
     buffer[4] = 0xA0;
     buffer[5] = 0x02;   // Device Address
-    buffer[6] = 0x01;   // Auto send read disabled
+    buffer[6] = 0x00;   // Auto send read disabled
     buffer[7] = 0x03;   // Write Time Out of 1000ms
     buffer[8] = 0xE8;
     buffer[9] = 0x03;   // Read Time out of 1000ms
@@ -229,9 +229,9 @@ int main(int argc, char *argv[])
     buffer[0] = 0x11;   // Data Write Read Request
     buffer[1] = 0xA4;   // MAXIM IC Fan Controller Address
     buffer[2] = 0x00;   // Number of bytes to read back
-    buffer[3] = 0x09;
+    buffer[3] = 0x02;
     buffer[4] = 0x01;   // Number of bytes to send to target
-    buffer[5] = 0x9D;   // Data to send
+    buffer[5] = 0x90;   // Data to send
     status = hid_write(device, buffer, 6);
     if(status == -1)
     {
@@ -245,139 +245,7 @@ int main(int argc, char *argv[])
     }
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
-    Sleep(10);
-    /// Read What was Read
-    printf("***Read what was read before request1***\n");
-    status = hid_read_timeout(device, buffer, 64, 1000);
-    if(status == -1)
-    {
-        printf("failed to read Data Read Request\n");
-    }
-    else
-    {
-        if (status == 0)
-        {
-            printf("CP2112 did not send any data back\n");
-        }
-        else
-        {
-            printf("got status\n");
-            printf("Bytes recieved: %d \n",status - 1);
-            printf(" Buffer[0]: %02hX\n", buffer[0]);
-            printf(" Buffer[1]: %02hX\n", buffer[1]);
-            printf(" Buffer[2]: %02hX\n", buffer[2]);
-            printf(" Buffer[3]: %02hX\n", buffer[3]);
-            printf(" Buffer[4]: %02hX\n", buffer[4]);
-            printf(" Buffer[5]: %02hX\n", buffer[5]);
-            printf(" Buffer[6]: %02hX\n", buffer[6]);
-            printf(" Buffer[7]: %02hX\n", buffer[7]);
-            printf(" Buffer[8]: %02hX\n", buffer[8]);
-            printf(" Buffer[9]: %02hX\n", buffer[7]);
-            printf("Buffer[10]: %02hX\n", buffer[10]);
-        }
-    }
-
-    memset((void*) &buffer[0], 0x00, sizeof(buffer));
-    Sleep(50);
-    /// Read What was Read
-    printf("***Read what was read before request2***\n");
-    status = hid_read_timeout(device, buffer, 64, 1000);
-    if(status == -1)
-    {
-        printf("failed to read Data Read Request\n");
-    }
-    else
-    {
-        if (status == 0)
-        {
-            printf("CP2112 did not send any data back\n");
-        }
-        else
-        {
-            printf("got status\n");
-            printf("Bytes recieved: %d \n",status - 1);
-            printf(" Buffer[0]: %02hX\n", buffer[0]);
-            printf(" Buffer[1]: %02hX\n", buffer[1]);
-            printf(" Buffer[2]: %02hX\n", buffer[2]);
-            printf(" Buffer[3]: %02hX\n", buffer[3]);
-            printf(" Buffer[4]: %02hX\n", buffer[4]);
-            printf(" Buffer[5]: %02hX\n", buffer[5]);
-            printf(" Buffer[6]: %02hX\n", buffer[6]);
-            printf(" Buffer[7]: %02hX\n", buffer[7]);
-            printf(" Buffer[8]: %02hX\n", buffer[8]);
-            printf(" Buffer[9]: %02hX\n", buffer[7]);
-            printf("Buffer[10]: %02hX\n", buffer[10]);
-        }
-    }
-
-    memset((void*) &buffer[0], 0x00, sizeof(buffer));
-    Sleep(50);
-    /// Read What was Read
-    printf("***Read what was read before request3***\n");
-    status = hid_read_timeout(device, buffer, 64, 1000);
-    if(status == -1)
-    {
-        printf("failed to read Data Read Request\n");
-    }
-    else
-    {
-        if (status == 0)
-        {
-            printf("CP2112 did not send any data back\n");
-        }
-        else
-        {
-            printf("got status\n");
-            printf("Bytes recieved: %d \n",status - 1);
-            printf(" Buffer[0]: %02hX\n", buffer[0]);
-            printf(" Buffer[1]: %02hX\n", buffer[1]);
-            printf(" Buffer[2]: %02hX\n", buffer[2]);
-            printf(" Buffer[3]: %02hX\n", buffer[3]);
-            printf(" Buffer[4]: %02hX\n", buffer[4]);
-            printf(" Buffer[5]: %02hX\n", buffer[5]);
-            printf(" Buffer[6]: %02hX\n", buffer[6]);
-            printf(" Buffer[7]: %02hX\n", buffer[7]);
-            printf(" Buffer[8]: %02hX\n", buffer[8]);
-            printf(" Buffer[9]: %02hX\n", buffer[7]);
-            printf("Buffer[10]: %02hX\n", buffer[10]);
-        }
-    }
-
-    memset((void*) &buffer[0], 0x00, sizeof(buffer));
-    Sleep(50);
-    /// Read What was Read
-    printf("***Read what was read before request***\n");
-    status = hid_read_timeout(device, buffer, 64, 1000);
-    if(status == -1)
-    {
-        printf("failed to read Data Read Request\n");
-    }
-    else
-    {
-        if (status == 0)
-        {
-            printf("CP2112 did not send any data back\n");
-        }
-        else
-        {
-            printf("got status\n");
-            printf("Bytes recieved: %d \n",status - 1);
-            printf(" Buffer[0]: %02hX\n", buffer[0]);
-            printf(" Buffer[1]: %02hX\n", buffer[1]);
-            printf(" Buffer[2]: %02hX\n", buffer[2]);
-            printf(" Buffer[3]: %02hX\n", buffer[3]);
-            printf(" Buffer[4]: %02hX\n", buffer[4]);
-            printf(" Buffer[5]: %02hX\n", buffer[5]);
-            printf(" Buffer[6]: %02hX\n", buffer[6]);
-            printf(" Buffer[7]: %02hX\n", buffer[7]);
-            printf(" Buffer[8]: %02hX\n", buffer[8]);
-            printf(" Buffer[9]: %02hX\n", buffer[7]);
-            printf("Buffer[10]: %02hX\n", buffer[10]);
-        }
-    }
-
-
-
+    Sleep(100);
     /// Send Transfer Status request
     printf("***Send Transfer status request***\n");
     buffer[0] = 0x15;   // Transfer Status request
@@ -395,7 +263,7 @@ int main(int argc, char *argv[])
 
     /// Read Transfer Status Report about the SMBus data writen
     printf("***Read Transfer status request***\n");
-    status = hid_read_timeout(device, buffer, 64, 1000);
+    status = hid_read_timeout(device, buffer, 7, 1000);
     if(status == -1)
     {
         printf("failed to read status request\n");
@@ -417,39 +285,39 @@ int main(int argc, char *argv[])
         printf("Buffer[10]: %02hX\n", buffer[10]);
     }
 
+    buffer[0] = 0x12;   //Data Read Force Send
+    buffer[1] = 0xFF;   //Number of bytes to send
 
-    ///Config the CP2112 SMBus for operation
-    printf("***Configure SMBus for operation***\n");
-    printf("***  Autosend will be disabled  ***\n");
-    buffer[0] = 0x06;   // Get/Set SMBus Config
-    buffer[1] = 0x00;   // Clock Speed (100Khz)
-    buffer[2] = 0x01;
-    buffer[3] = 0x86;
-    buffer[4] = 0xA0;
-    buffer[5] = 0x02;   // Device Address
-    buffer[6] = 0x00;   // Auto send read disabled
-    buffer[7] = 0x03;   // Write Time Out of 1000ms
-    buffer[8] = 0xE8;
-    buffer[9] = 0x03;   // Read Time out of 1000ms
-    buffer[10] = 0xE8;
-    buffer[11] = 0x00;   // SCL low timeout disabled
-    buffer[12] = 0x03;   // 2 Retires
-    buffer[13] = 0xE8;
-    status = hid_send_feature_report(device, buffer, 14);
+    status = hid_write(device, buffer, 2);
+
+    status = hid_read(device, buffer, 64);
     if(status == -1)
     {
-        printf("failed to send SMBus config feature report\n");
-        //string = hid_error(device);
+        printf("failed to read status request\n");
     }
     else
     {
-        printf("SMBus config sent to CP2112\n");
-        printf("Bytes sent: %d \n",status - 1);
+        printf("got status\n");
+        printf("Bytes recieved: %d \n",status - 1);
+        printf(" Buffer[0]: %02hX\n", buffer[0]);
+        printf(" Buffer[1]: %02hX\n", buffer[1]);
+        printf(" Buffer[2]: %02hX\n", buffer[2]);
+        printf(" Buffer[3]: %02hX\n", buffer[3]);
+        printf(" Buffer[4]: %02hX\n", buffer[4]);
+        printf(" Buffer[5]: %02hX\n", buffer[5]);
+        printf(" Buffer[6]: %02hX\n", buffer[6]);
+        printf(" Buffer[7]: %02hX\n", buffer[7]);
+        printf(" Buffer[8]: %02hX\n", buffer[8]);
+        printf(" Buffer[9]: %02hX\n", buffer[7]);
+        printf("Buffer[10]: %02hX\n", buffer[10]);
+        printf("Buffer[11]: %02hX\n", buffer[11]);
+        printf("Buffer[12]: %02hX\n", buffer[12]);
+        printf("Buffer[13]: %02hX\n", buffer[13]);
     }
+
 
     printf("waiting for 1 second\n");
     //Sleep(1000);
-
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     /// Send Data Write Read Request
     printf("***Send Data Read request***\n");
