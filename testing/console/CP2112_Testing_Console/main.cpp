@@ -65,8 +65,8 @@ int main(int argc, char *argv[])
     cout << "EMU i2c_write result        : " << status << endl;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
-    buffer[0] = 0x9D;
-    status = EMU->i2c_write_read(0xA4, 0x01, 0x08, buffer);
+    buffer[0] = 0x90;
+    status = EMU->i2c_write_read(0xA4, 0x01, 0x02, buffer);
     cout << "EMU i2c_write_read result        : " << status << endl;
     printf(" Buffer[0]: %02hX\n", buffer[0]);
     printf(" Buffer[1]: %02hX\n", buffer[1]);
