@@ -40,7 +40,7 @@ public:
     explicit CP2112_HIDAPI();
     ~CP2112_HIDAPI();
     int open_device(uint16 vendorID, uint16 productID);
-    int i2c_configure();
+    int SMBus_configure();
     int cp2112_configure();
     int set_gpio(uint8 mask, uint8 GPIO);
     int get_gpio(uint8 *data);
@@ -53,7 +53,7 @@ public:
     hid_device_info device_info;
 private:
     hid_device *device;
-    unsigned char buffer[MAX_STR];
+    uint8 buffer[MAX_STR];
     int hidStatus;
     int i2cStatus;
 };
