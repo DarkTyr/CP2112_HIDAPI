@@ -286,9 +286,10 @@ int main(int argc, char *argv[])
     }
 
     buffer[0] = 0x12;   //Data Read Force Send
-    buffer[1] = 0xFF;   //Number of bytes to send
+    buffer[1] = 0x00;
+    buffer[2] = 0xFF;   //Number of bytes to send
 
-    status = hid_write(device, buffer, 2);
+    status = hid_write(device, buffer, 3);
 
     status = hid_read(device, buffer, 64);
     if(status == -1)
@@ -339,8 +340,33 @@ int main(int argc, char *argv[])
         printf("Bytes sent: %d \n",status - 1);
     }
 
+    status = hid_read_timeout(device, buffer, 64, 250);
+    if(status == -1)
+    {
+        printf("failed to read status request\n");
+    }
+    else
+    {
+        printf("got status\n");
+        printf("Bytes recieved: %d \n",status - 1);
+        printf(" Buffer[0]: %02hX\n", buffer[0]);
+        printf(" Buffer[1]: %02hX\n", buffer[1]);
+        printf(" Buffer[2]: %02hX\n", buffer[2]);
+        printf(" Buffer[3]: %02hX\n", buffer[3]);
+        printf(" Buffer[4]: %02hX\n", buffer[4]);
+        printf(" Buffer[5]: %02hX\n", buffer[5]);
+        printf(" Buffer[6]: %02hX\n", buffer[6]);
+        printf(" Buffer[7]: %02hX\n", buffer[7]);
+        printf(" Buffer[8]: %02hX\n", buffer[8]);
+        printf(" Buffer[9]: %02hX\n", buffer[7]);
+        printf("Buffer[10]: %02hX\n", buffer[10]);
+        printf("Buffer[11]: %02hX\n", buffer[11]);
+        printf("Buffer[12]: %02hX\n", buffer[12]);
+        printf("Buffer[13]: %02hX\n", buffer[13]);
+    }
+
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
-    Sleep(1000);
+    Sleep(100);
 
     /// Send Transfer Status request
     printf("***Send Transfer status request***\n");
@@ -382,9 +408,10 @@ int main(int argc, char *argv[])
     }
 
     buffer[0] = 0x12;   //Data Read Force Send
-    buffer[1] = 0xFF;   //Number of bytes to send
+    buffer[1] = 0x00;
+    buffer[2] = 0xFF;   //Number of bytes to send
 
-    status = hid_write(device, buffer, 2);
+    status = hid_write(device, buffer, 3);
 
     status = hid_read(device, buffer, 64);
     if(status == -1)
@@ -411,6 +438,30 @@ int main(int argc, char *argv[])
         printf("Buffer[13]: %02hX\n", buffer[13]);
     }
 
+    status = hid_read(device, buffer, 64);
+    if(status == -1)
+    {
+        printf("failed to read status request\n");
+    }
+    else
+    {
+        printf("got status\n");
+        printf("Bytes recieved: %d \n",status - 1);
+        printf(" Buffer[0]: %02hX\n", buffer[0]);
+        printf(" Buffer[1]: %02hX\n", buffer[1]);
+        printf(" Buffer[2]: %02hX\n", buffer[2]);
+        printf(" Buffer[3]: %02hX\n", buffer[3]);
+        printf(" Buffer[4]: %02hX\n", buffer[4]);
+        printf(" Buffer[5]: %02hX\n", buffer[5]);
+        printf(" Buffer[6]: %02hX\n", buffer[6]);
+        printf(" Buffer[7]: %02hX\n", buffer[7]);
+        printf(" Buffer[8]: %02hX\n", buffer[8]);
+        printf(" Buffer[9]: %02hX\n", buffer[7]);
+        printf("Buffer[10]: %02hX\n", buffer[10]);
+        printf("Buffer[11]: %02hX\n", buffer[11]);
+        printf("Buffer[12]: %02hX\n", buffer[12]);
+        printf("Buffer[13]: %02hX\n", buffer[13]);
+    }
 
 
 
