@@ -194,7 +194,7 @@ int CP2112_HIDAPI::i2c_read(uint8 i2cAddress, uint8 bytesToRecieve, uint8 *data)
 
 int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 bytesToRecieve, uint8 *data)
 {
-    //uint8 i;
+    uint8 bytesRead = 0;
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     /// Send Data Write Read Request
     buffer[0] = DATA_WRITE_READ; //0x11
@@ -211,28 +211,31 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
     i2cStatus = 0x01;
     while(i2cStatus == 0x01)
     {
-        Sleep(1000);
+        Sleep(10);
         /// Send Transfer Status request
         buffer[0] = XFER_STATUS_REQ;   // 0x15
         buffer[1] = 0x01;   //Request SMBus Transfer Status
         hidStatus = hid_write(device, buffer, 2);
 
+        Sleep(10);
         /// Read Transfer Status Report about the SMBus data writen
         memset((void*) &buffer[0], 0x00, sizeof(buffer));
         hidStatus = hid_read(device, buffer, 7);
-        Sleep(10);
-        if(buffer[0] == XFER_STATUS_RESPONSE) //0x16
+
+        if(buffer[0] == XFER_STATUS_RESPONSE || buffer[0] == DATA_READ_RESPONSE) //0x16 or 0x13
         {
-            i2cStatus = buffer[1];
-            if(i2cStatus == 0x02)
+            if(buffer[1] == 0x02)
             {
+                i2cStatus = buffer[1];
                 memset((void*) &buffer[0], 0x00, sizeof(buffer));
                 buffer[0] = DATA_READ_FORCE;   // 0x12
-                buffer[1] = 0xFF;   //Request SMBus Transfer Status
-                hidStatus = hid_write(device, buffer, 2);
+                buffer[1] = 0x00;
+                buffer[2] = 0xFF;   //Request SMBus Transfer Status
+                hidStatus = hid_write(device, buffer, 3);
                 hidStatus = hid_read_timeout(device, buffer, 64, 1000);
                 if(buffer[0] == DATA_READ_RESPONSE) // 0x13
                 {
+                    bytesRead = buffer[2];
                     if(buffer[1] == BUS_GOOD) //0x02
                     {
                         memmove((void*) &data[0], (void*) &buffer[3], buffer[2]);
@@ -241,51 +244,44 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
 
                     if(buffer[1] == BUS_IDLE) //0x00
                     {
+                        bytesRead = buffer[2];
                         memmove((void*) &data[0], (void*) &buffer[3], buffer[2]);
                         memset((void*) &data[buffer[2]], 0x00, sizeof(data));
                     }
                 }
+                hidStatus = hid_read_timeout(device, buffer, 64, 100);
             }
 
-            else if(i2cStatus == 0x00)
+            else if(buffer[1] == 0x00)
             {
+                i2cStatus = buffer[1];
                 memset((void*) &buffer[0], 0x00, sizeof(buffer));
-                buffer[0] = DATA_READ_FORCE;   // Transfer Status request
-                buffer[1] = 0xFF;   //Request SMBus Transfer Status
-                hidStatus = hid_write(device, buffer, 2);
+                buffer[0] = DATA_READ_FORCE;   // 0x12
+                buffer[1] = 0x00;
+                buffer[2] = 0xFF;   //Request SMBus Transfer Status
+                hidStatus = hid_write(device, buffer, 3);
                 hidStatus = hid_read(device, buffer, 64);
                 if(buffer[0] == DATA_READ_RESPONSE)
                 {
                     if((buffer[1] == BUS_GOOD) & (buffer[2] > 0x00))
                     {
+                        bytesRead = buffer[2];
                         memmove((void*) &data[0], (void*) &buffer[3], buffer[2]);
-                        //memset((void*) &data[buffer[2]], 0x00, sizeof(data));
+                        memset((void*) &data[buffer[2]], 0x00, sizeof(data));
                     }
 
                     else if((buffer[1] == BUS_IDLE) & (buffer[2] > 0x00))
                     {
+                        bytesRead = buffer[2];
                         memmove((void*) &data[0], (void*) &buffer[3], buffer[2]);
-                        //memset((void*) &data[buffer[2]], 0x00, sizeof(data));
+                        memset((void*) &data[buffer[2]], 0x00, sizeof(data));
                     }
                 }
-            }
-        }
-        else if (buffer[0] == DATA_READ_RESPONSE)
-        {
-            if((buffer[1] == BUS_GOOD) & (buffer[2] > 0x00))
-            {
-                memmove((void*) &data[0], (void*) &buffer[3], buffer[2]);
-                //memset((void*) &data[buffer[2]], 0x00, sizeof(data));
-            }
-
-            else if((buffer[1] == BUS_IDLE) & (buffer[2] > 0x00))
-            {
-                memmove((void*) &data[0], (void*) &buffer[3], buffer[2]);
-                //memset((void*) &data[buffer[2]], 0x00, sizeof(data));
+                hid_read_timeout(device, buffer, 64, 100);
             }
         }
     }
-    return hidStatus;
+    return bytesRead;
 }
 
 int CP2112_HIDAPI::exit_device()
