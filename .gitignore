@@ -40,3 +40,4 @@ testing/console/CP2112_Testing_Console/Qt_5_3_MSVC2013_OpenGL_64bit/Makefile.Rel
 *Makefile.Debug
 *Makefile.Release
 *.pro.user
+*.pro.user*

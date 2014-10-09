@@ -46,9 +46,15 @@ CP2112_HIDAPI::CP2112_HIDAPI()
 }
 CP2112_HIDAPI::~CP2112_HIDAPI()
 {
-    //hid_close(device);
-    //hid_exit();
-    //delete this;
+    if(device == NULL)
+    {
+        ;
+    }
+    else
+    {
+        exit_device();
+    }
+    hid_exit();
 }
 
 int CP2112_HIDAPI::open_device(uint16 vendorID, uint16 productID)
@@ -195,7 +201,7 @@ int CP2112_HIDAPI::i2c_read(uint8 i2cAddress, uint8 bytesToRecieve, uint8 *data)
 int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 bytesToRecieve, uint8 *data)
 {
     uint8 bytesRead = 0;
-    //uint8 recieveIndex = 0;
+    uint8 recieveIndex = 0;
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     /// Send Data Write Read Request
     buffer[0] = DATA_WRITE_READ; //0x11
@@ -242,16 +248,17 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
 
         Sleep(10);
         /// Read Transfer Status Report about the SMBus data writen
-        //memset((void*) &buffer[0], 0x00, sizeof(buffer));
+        memset((void*) &buffer[0], 0x00, sizeof(buffer));
         hidStatus = hid_read(device, buffer, 64);
 
         if(buffer[0] == 0x13)
         {
             if(buffer[2] > 0x00)
             {
-                for(bytesRead; bytesRead < buffer[2]; bytesRead++)
+                for(recieveIndex = 0; recieveIndex < buffer[2]; recieveIndex++)
                 {
-                    data[bytesRead] = buffer[bytesRead + 3];
+                    data[bytesRead] = buffer[recieveIndex + 3];
+                    bytesRead++;
                 }
             }
         }
@@ -260,18 +267,23 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
     return bytesRead;
 }
 
-int CP2112_HIDAPI::getStatus()
+int CP2112_HIDAPI::deviceCheck()
 {
+    if(device == NULL)
+    {
+        printf("device is still set to NULL");
+        return -1;
 
-}
-
-int CP2112_HIDAPI::getData(uint8 bytesToGet, uint8 *data)
-{
-
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 int CP2112_HIDAPI::exit_device()
 {
     hid_close(device);
+    device = NULL;
     return 0;
 }

@@ -56,6 +56,8 @@ private:
     uint8 buffer[MAX_STR];
     int hidStatus;
     int i2cStatus;
+
+    int deviceCheck();
 };
 
 #endif // CP2112_HIDAPI_H
