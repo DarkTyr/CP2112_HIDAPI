@@ -152,13 +152,13 @@ int CP2112_HIDAPI::i2c_write(uint8 i2cAddress, uint8 bytesToSend, uint8 *data)
     i2cStatus = 0x01;
     while(i2cStatus == 0x01)
     {
-        Sleep(10);
+        //Sleep(10);
         /// Send Transfer Status request
         buffer[0] = XFER_STATUS_REQ;   // 0x15
         buffer[1] = 0x01;   //Request SMBus Transfer Status
         hidStatus = hid_write(device, buffer, 2);
 
-        Sleep(10);
+        //Sleep(10);
         /// Read Transfer Status Report about the SMBus data writen
         memset((void*) &buffer[0], 0x00, sizeof(buffer));
         hidStatus = hid_read(device, buffer, 7);
@@ -189,13 +189,13 @@ int CP2112_HIDAPI::i2c_read(uint8 i2cAddress, uint8 bytesToRecieve, uint8 *data)
 
     while(i2cStatus == 0x01)
     {
-        Sleep(10);
+        //Sleep(10);
         /// Send Transfer Status request
         buffer[0] = XFER_STATUS_REQ;   // 0x15
         buffer[1] = 0x01;   //Request SMBus Transfer Status
         hidStatus = hid_write(device, buffer, 2);
 
-        Sleep(10);
+        //Sleep(10);
         /// Read Transfer Status Report about the SMBus data writen
         memset((void*) &buffer[0], 0x00, sizeof(buffer));
         hidStatus = hid_read(device, buffer, 7);
@@ -208,14 +208,14 @@ int CP2112_HIDAPI::i2c_read(uint8 i2cAddress, uint8 bytesToRecieve, uint8 *data)
 
     while(bytesRead < bytesToRecieve)
     {
-        Sleep(10);
+        //Sleep(10);
         /// Send Transfer Status request
         buffer[0] = DATA_READ_FORCE;   // 0x12
         buffer[1] = 0x00;
         buffer[2] = 0xFF;   // Send upto 256 bytes please
         hidStatus = hid_write(device, buffer, 3);
 
-        Sleep(10);
+        //Sleep(10);
         /// Read Transfer Status Report about the SMBus data writen
         memset((void*) &buffer[0], 0x00, sizeof(buffer));
         hidStatus = hid_read(device, buffer, 64);
@@ -258,13 +258,13 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
 
     while(i2cStatus == 0x01)
     {
-        Sleep(10);
+        //Sleep(10);
         /// Send Transfer Status request
         buffer[0] = XFER_STATUS_REQ;   // 0x15
         buffer[1] = 0x01;   //Request SMBus Transfer Status
         hidStatus = hid_write(device, buffer, 2);
 
-        Sleep(10);
+        //Sleep(10);
         /// Read Transfer Status Report about the SMBus data writen
         memset((void*) &buffer[0], 0x00, sizeof(buffer));
         hidStatus = hid_read(device, buffer, 7);
@@ -277,14 +277,14 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
 
     while(bytesRead < bytesToRecieve)
     {
-        Sleep(10);
+        //Sleep(10);
         /// Send Transfer Status request
         buffer[0] = DATA_READ_FORCE;   // 0x12
         buffer[1] = 0x00;
         buffer[2] = 0xFF;   // Send upto 256 bytes please
         hidStatus = hid_write(device, buffer, 3);
 
-        Sleep(10);
+        //Sleep(10);
         /// Read Transfer Status Report about the SMBus data writen
         memset((void*) &buffer[0], 0x00, sizeof(buffer));
         hidStatus = hid_read(device, buffer, 64);
