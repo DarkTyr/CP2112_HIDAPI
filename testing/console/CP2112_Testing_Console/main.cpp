@@ -57,12 +57,29 @@ int main(int argc, char *argv[])
     status = EMU->SMBus_configure();
     cout << "EMU i2c_configure result    : " << status << endl;
 
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x10;
+    buffer[1] = 0x00;
+    status = EMU->i2c_write(0xA4, 2, buffer);
+    cout << "EMU i2c_write result Disable write protect        : " << status << endl;
+
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x10;
+    status = EMU->i2c_write_read(0xA4, 0x01, 0x01, buffer);
+    cout << "EMU i2c_write_read result Write protect status       : " << status << endl;
+    printf(" Buffer[0]: %02hX\n", buffer[0]);
+
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x00;
     buffer[1] = 0x01;
     status = EMU->i2c_write(0xA4, 2, buffer);
     cout << "EMU i2c_write result        : " << status << endl;
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x00;
+    status = EMU->i2c_write_read(0xA4, 0x01, 0x01, buffer);
+    cout << "EMU i2c_write_read result PAGE Value     : " << status << endl;
+    printf(" Buffer[0]: %02hX\n", buffer[0]);
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x9B;
@@ -99,6 +116,60 @@ int main(int argc, char *argv[])
     printf("Buffer[10]: %02hX\n", buffer[10]);
     printf("Buffer[11]: %02hX\n", buffer[11]);
     printf("Buffer[12]: %02hX\n", buffer[12]);
+
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x00;
+    buffer[1] = 0x00;
+    status = EMU->i2c_write(0xA4, 2, buffer);
+    cout << "EMU i2c_write result        : " << status << endl;
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x00;
+    status = EMU->i2c_write_read(0xA4, 0x01, 0x01, buffer);
+    cout << "EMU i2c_write_read result PAGE Value     : " << status << endl;
+    printf(" Buffer[0]: %02hX\n", buffer[0]);
+
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x90;
+    status = EMU->i2c_write_read(0xA4, 0x01, 0x02, buffer);
+    cout << "EMU i2c_write_read result FAN0        : " << status << endl;
+    printf(" Buffer[0]: %02hX\n", buffer[0]);
+    printf(" Buffer[1]: %02hX\n", buffer[1]);
+
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x00;
+    buffer[1] = 0x01;
+    status = EMU->i2c_write(0xA4, 2, buffer);
+    cout << "EMU i2c_write result        : " << status << endl;
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x00;
+    status = EMU->i2c_write_read(0xA4, 0x01, 0x01, buffer);
+    cout << "EMU i2c_write_read result PAGE Value     : " << status << endl;
+    printf(" Buffer[0]: %02hX\n", buffer[0]);
+
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x90;
+    status = EMU->i2c_write_read(0xA4, 0x01, 0x02, buffer);
+    cout << "EMU i2c_write_read result FAN1        : " << status << endl;
+    printf(" Buffer[0]: %02hX\n", buffer[0]);
+    printf(" Buffer[1]: %02hX\n", buffer[1]);
+
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x00;
+    buffer[1] = 0x02;
+    status = EMU->i2c_write(0xA4, 2, buffer);
+    cout << "EMU i2c_write result        : " << status << endl;
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x00;
+    status = EMU->i2c_write_read(0xA4, 0x01, 0x01, buffer);
+    cout << "EMU i2c_write_read result PAGE Value     : " << status << endl;
+    printf(" Buffer[0]: %02hX\n", buffer[0]);
+
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x90;
+    status = EMU->i2c_write_read(0xA4, 0x01, 0x02, buffer);
+    cout << "EMU i2c_write_read result FAN2       : " << status << endl;
+    printf(" Buffer[0]: %02hX\n", buffer[0]);
+    printf(" Buffer[1]: %02hX\n", buffer[1]);
 
 
     EMU->exit_device();

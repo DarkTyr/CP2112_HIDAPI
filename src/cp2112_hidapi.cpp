@@ -141,53 +141,30 @@ int CP2112_HIDAPI::get_gpio(uint8 *data)
     return hidStatus;
 }
 
-int CP2112_HIDAPI::i2c_write(uint8 i2cAddress, uint8 bytesToTransfer, uint8 *data)
+int CP2112_HIDAPI::i2c_write(uint8 i2cAddress, uint8 bytesToSend, uint8 *data)
 {
     buffer[0] = DATA_WRITE;
     buffer[1] = i2cAddress;
-    buffer[2] = bytesToTransfer;
-    buffer[3] = *data;
+    buffer[2] = bytesToSend;
+    memmove((void*) &buffer[3], (void*) &data[0], bytesToSend);
     // Send data
-    hidStatus = hid_write(device, buffer, bytesToTransfer + 3);
+    hidStatus = hid_write(device, buffer, bytesToSend + 3);
     i2cStatus = 0x01;
     while(i2cStatus == 0x01)
     {
-        Sleep(25);
-        // Send Transfer Status request
-        buffer[0] = XFER_STATUS_REQ;   // Transfer Status request
+        Sleep(10);
+        /// Send Transfer Status request
+        buffer[0] = XFER_STATUS_REQ;   // 0x15
         buffer[1] = 0x01;   //Request SMBus Transfer Status
         hidStatus = hid_write(device, buffer, 2);
-        if(hidStatus == -1)
-        {
-            printf("failed to send transfer status request \n");
-            //string = hid_error(device);
-        }
-        else
-        {
-            printf("Sent Transfer status request\n");
-            printf("Bytes sent: %d \n",hidStatus - 1);
-        }
-        // Read Transfer Status Report about the SMBus data writen
+
+        Sleep(10);
+        /// Read Transfer Status Report about the SMBus data writen
+        memset((void*) &buffer[0], 0x00, sizeof(buffer));
         hidStatus = hid_read(device, buffer, 7);
-        if(hidStatus == -1)
-        {
-            printf("failed to read status request from CP2112\n");
-            //string = hid_error(device);
-        }
-        else
+        if(buffer[0] == 0x16)
         {
             i2cStatus = buffer[1];
-            /*
-            printf("got status\n");
-            printf("Bytes recieved: %d \n",hidStatus - 1);
-            printf("Buffer[0]: %02hX\n", buffer[0]);
-            printf("Buffer[1]: %02hX\n", buffer[1]);
-            printf("Buffer[2]: %02hX\n", buffer[2]);
-            printf("Buffer[3]: %02hX\n", buffer[3]);
-            printf("Buffer[4]: %02hX\n", buffer[4]);
-            printf("Buffer[5]: %02hX\n", buffer[5]);
-            printf("Buffer[6]: %02hX\n", buffer[6]);
-            */
         }
     }
     return i2cStatus;
@@ -195,7 +172,68 @@ int CP2112_HIDAPI::i2c_write(uint8 i2cAddress, uint8 bytesToTransfer, uint8 *dat
 
 int CP2112_HIDAPI::i2c_read(uint8 i2cAddress, uint8 bytesToRecieve, uint8 *data)
 {
-    return 0;
+    uint8 bytesRead = 0;
+    uint8 recieveIndex = 0;
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    /// Send Data Write Read Request
+    buffer[0] = DATA_READ; //0x11
+    buffer[1] = i2cAddress;
+    buffer[2] = 0x00;
+    buffer[3] = bytesToRecieve;
+    memset((void*) &data[0], 0x00, sizeof(data));
+
+
+    hidStatus = hid_write(device, buffer, 4);
+    i2cStatus = 0x01;
+
+
+    while(i2cStatus == 0x01)
+    {
+        Sleep(10);
+        /// Send Transfer Status request
+        buffer[0] = XFER_STATUS_REQ;   // 0x15
+        buffer[1] = 0x01;   //Request SMBus Transfer Status
+        hidStatus = hid_write(device, buffer, 2);
+
+        Sleep(10);
+        /// Read Transfer Status Report about the SMBus data writen
+        memset((void*) &buffer[0], 0x00, sizeof(buffer));
+        hidStatus = hid_read(device, buffer, 7);
+        if(buffer[0] == 0x16)
+        {
+            i2cStatus = buffer[1];
+        }
+    }
+
+
+    while(bytesRead < bytesToRecieve)
+    {
+        Sleep(10);
+        /// Send Transfer Status request
+        buffer[0] = DATA_READ_FORCE;   // 0x12
+        buffer[1] = 0x00;
+        buffer[2] = 0xFF;   // Send upto 256 bytes please
+        hidStatus = hid_write(device, buffer, 3);
+
+        Sleep(10);
+        /// Read Transfer Status Report about the SMBus data writen
+        memset((void*) &buffer[0], 0x00, sizeof(buffer));
+        hidStatus = hid_read(device, buffer, 64);
+
+        if(buffer[0] == 0x13)
+        {
+            if(buffer[2] > 0x00)
+            {
+                for(recieveIndex = 0; recieveIndex < buffer[2]; recieveIndex++)
+                {
+                    data[bytesRead] = buffer[recieveIndex + 3];
+                    bytesRead++;
+                }
+            }
+        }
+    }
+
+    return bytesRead;
 }
 
 int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 bytesToRecieve, uint8 *data)

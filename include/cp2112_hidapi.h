@@ -44,7 +44,7 @@ public:
     int cp2112_configure();
     int set_gpio(uint8 mask, uint8 GPIO);
     int get_gpio(uint8 *data);
-    int i2c_write(uint8 i2cAddress, uint8 bytesToTransfer, uint8 *data);
+    int i2c_write(uint8 i2cAddress, uint8 bytesToSend, uint8 *data);
     int i2c_read(uint8 i2cAddress, uint8 bytesToRecieve, uint8 *data);
     int i2c_write_read(uint8 i2cAddress, uint8 bytesToTransfer, uint8 bytesToRecieve, uint8 *data);
     int exit_device();
