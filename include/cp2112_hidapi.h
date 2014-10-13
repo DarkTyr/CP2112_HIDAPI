@@ -51,6 +51,7 @@ public:
 
 
     hid_device_info device_info;
+
 private:
     hid_device *device;
     uint8 buffer[MAX_STR];

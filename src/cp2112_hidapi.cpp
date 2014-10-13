@@ -43,6 +43,8 @@ CP2112_HIDAPI::CP2112_HIDAPI()
     hid_init();
     device = NULL;
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    hidStatus = 0;
+    i2cStatus = 0;
 }
 CP2112_HIDAPI::~CP2112_HIDAPI()
 {
@@ -60,13 +62,24 @@ CP2112_HIDAPI::~CP2112_HIDAPI()
 int CP2112_HIDAPI::open_device(uint16 vendorID, uint16 productID)
 {
     device = hid_open(vendorID, productID, NULL);
-    //device_info = *hid_enumerate(vendorID, productID);
-    //hid_free_enumeration(&device_info);
+    if(device == NULL)
+    {
+        printf("No device matching VID: 0x%04hX PID: 0x%04hX\n", vendorID, productID);
+        return -1;
+    }
+    device_info = *hid_enumerate(vendorID, productID);
+    hid_free_enumeration(&device_info);
     return 0;
 }
 
 int CP2112_HIDAPI::SMBus_configure()
 {
+    hidStatus = deviceCheck();
+    if (hidStatus < 0)
+    {
+        return -1;
+    }
+
     ///Config the CP2112 SMBus for operation
     //printf("***Configure SMBus for operation***\n");
     buffer[0] = GETSETSMBUSCONFIG;   // Get/Set SMBus Config
@@ -101,6 +114,11 @@ int CP2112_HIDAPI::SMBus_configure()
 
 int CP2112_HIDAPI::cp2112_configure()
 {
+    hidStatus = deviceCheck();
+    if (hidStatus < 0)
+    {
+        return -1;
+    }
     ///Config the CP2112 I/O for operation
     //printf("***Configure the CP2112 IO for operation***\n");
     buffer[0] = GETSETGPIOCONFIG;   // Get/Set GPIO config (feature Request)
@@ -126,6 +144,11 @@ int CP2112_HIDAPI::cp2112_configure()
 
 int CP2112_HIDAPI::set_gpio(uint8 mask, uint8 GPIO)
 {
+    hidStatus = deviceCheck();
+    if (hidStatus < 0)
+    {
+        return -1;
+    }
     buffer[0] = SET_GPIO;
     buffer[1] = GPIO;
     buffer[2] = mask;
@@ -135,6 +158,11 @@ int CP2112_HIDAPI::set_gpio(uint8 mask, uint8 GPIO)
 
 int CP2112_HIDAPI::get_gpio(uint8 *data)
 {
+    hidStatus = deviceCheck();
+    if (hidStatus < 0)
+    {
+        return -1;
+    }
     buffer[0] = GET_GPIO;
     hidStatus = hid_get_feature_report(device, buffer, 2);
     *data = buffer[1];
@@ -143,6 +171,11 @@ int CP2112_HIDAPI::get_gpio(uint8 *data)
 
 int CP2112_HIDAPI::i2c_write(uint8 i2cAddress, uint8 bytesToSend, uint8 *data)
 {
+    hidStatus = deviceCheck();
+    if (hidStatus < 0)
+    {
+        return -1;
+    }
     buffer[0] = DATA_WRITE;
     buffer[1] = i2cAddress;
     buffer[2] = bytesToSend;
@@ -172,6 +205,11 @@ int CP2112_HIDAPI::i2c_write(uint8 i2cAddress, uint8 bytesToSend, uint8 *data)
 
 int CP2112_HIDAPI::i2c_read(uint8 i2cAddress, uint8 bytesToRecieve, uint8 *data)
 {
+    hidStatus = deviceCheck();
+    if (hidStatus < 0)
+    {
+        return -1;
+    }
     uint8 bytesRead = 0;
     uint8 recieveIndex = 0;
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
@@ -238,6 +276,11 @@ int CP2112_HIDAPI::i2c_read(uint8 i2cAddress, uint8 bytesToRecieve, uint8 *data)
 
 int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 bytesToRecieve, uint8 *data)
 {
+    hidStatus = deviceCheck();
+    if (hidStatus < 0)
+    {
+        return -1;
+    }
     uint8 bytesRead = 0;
     uint8 recieveIndex = 0;
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
@@ -309,7 +352,7 @@ int CP2112_HIDAPI::deviceCheck()
 {
     if(device == NULL)
     {
-        printf("device is still set to NULL");
+        printf("no USB device has been opened with this object");
         return -1;
 
     }
@@ -321,6 +364,11 @@ int CP2112_HIDAPI::deviceCheck()
 
 int CP2112_HIDAPI::exit_device()
 {
+    if (device == NULL)
+    {
+        return 0;
+    }
+
     hid_close(device);
     device = NULL;
     return 0;
