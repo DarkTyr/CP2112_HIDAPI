@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     // Buffer to hold information being sent on the SMBus
     uint8 buffer[255];
 
-    // Temp variable to hold 16 bit values in
+    // Temp variable to hold 16 bit values in for display
     uint16 temp;
 
     // status of HID call, anything less than zero is bad
