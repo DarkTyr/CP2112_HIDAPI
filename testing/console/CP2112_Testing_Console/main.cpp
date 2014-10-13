@@ -288,5 +288,5 @@ int main(int argc, char *argv[])
 
     EMU->exit_device();
     delete EMU;
-    return a.exec();
+    return 0;
 }
