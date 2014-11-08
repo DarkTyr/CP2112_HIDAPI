@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
 
     // Temp variable to hold 16 bit values in for display
     uint16 temp;
+    double dTemp;
 
     // status of HID call, anything less than zero is bad
     int status;
@@ -218,6 +219,25 @@ int main(int argc, char *argv[])
     printf(" Buffer[1]: %02hX\n", buffer[1]);
     temp = ((buffer[1] << 8) + buffer[0])/100;
     cout << "Temp1: " << temp << endl;
+    dTemp = double((buffer[1] << 8) + buffer[0])/100;
+    cout << "Temp1: " << dTemp <<endl;
+
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x00;
+    buffer[1] = 0x07;
+    status = EMU->i2c_write(0xA4, 2, buffer);
+    cout << "EMU i2c_write result        : " << status << endl;
+
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x8D;
+    status = EMU->i2c_write_read(0xA4, 0x01, 0x02, buffer);
+    cout << "EMU i2c_write_read result Temp2       : " << status << endl;
+    printf(" Buffer[0]: %02hX\n", buffer[0]);
+    printf(" Buffer[1]: %02hX\n", buffer[1]);
+    temp = ((buffer[1] << 8) + buffer[0])/100;
+    cout << "Temp2: " << temp << endl;
+    dTemp = double((buffer[1] << 8) + buffer[0])/100;
+    cout << "Temp2: " << dTemp <<endl;
 
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
@@ -234,6 +254,8 @@ int main(int argc, char *argv[])
     printf(" Buffer[1]: %02hX\n", buffer[1]);
     temp = ((buffer[1] << 8) + buffer[0])/100;
     cout << "TempI2C1: " << temp << endl;
+    dTemp = double((buffer[1] << 8) + buffer[0])/100;
+    cout << "TempI2C1: " << dTemp <<endl;
 
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
@@ -250,7 +272,8 @@ int main(int argc, char *argv[])
     printf(" Buffer[1]: %02hX\n", buffer[1]);
     temp = ((buffer[1] << 8) + buffer[0])/100;
     cout << "TempI2C2: " << temp << endl;
-
+    dTemp = double((buffer[1] << 8) + buffer[0])/100;
+    cout << "TempI2C2: " << dTemp <<endl;
 
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
@@ -267,7 +290,8 @@ int main(int argc, char *argv[])
     printf(" Buffer[1]: %02hX\n", buffer[1]);
     temp = ((buffer[1] << 8) + buffer[0])/100;
     cout << "TempI2C3: " << temp << endl;
-
+    dTemp = double((buffer[1] << 8) + buffer[0])/100;
+    cout << "TempI2C3: " << dTemp <<endl;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x00;
@@ -281,10 +305,14 @@ int main(int argc, char *argv[])
     cout << "EMU i2c_write_read result I2C4       : " << status << endl;
     printf(" Buffer[0]: %02hX\n", buffer[0]);
     printf(" Buffer[1]: %02hX\n", buffer[1]);
+
     temp = ((buffer[1] << 8) + buffer[0])/100;
     cout << "TempI2C4: " << temp <<endl;
-
-
+    dTemp = double((buffer[1] << 8) + buffer[0])/100;
+    cout << "TempI2C4: " << dTemp <<endl;
+    cout << uppercase  << noshowbase << hex << setfill('0') << setw(8);
+    cout << " Buffer[0]: 0x" << +buffer[0] << endl;
+    cout << " Buffer[1]: 0x" << +buffer[1] << endl;
 
     EMU->exit_device();
     delete EMU;
