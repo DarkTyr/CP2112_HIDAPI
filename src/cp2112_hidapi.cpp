@@ -69,7 +69,7 @@ int CP2112_HIDAPI::open_device(uint16 vendorID, uint16 productID)
     }
     device_info = *hid_enumerate(vendorID, productID);
     hid_free_enumeration(&device_info);
-    return 0;
+    return 1;
 }
 
 int CP2112_HIDAPI::SMBus_configure()
@@ -79,7 +79,7 @@ int CP2112_HIDAPI::SMBus_configure()
     {
         return hidStatus;
     }
-
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
     ///Config the CP2112 SMBus for operation
     //printf("***Configure SMBus for operation***\n");
     buffer[0] = GETSETSMBUSCONFIG;   // Get/Set SMBus Config
@@ -119,6 +119,7 @@ int CP2112_HIDAPI::cp2112_configure()
     {
         return -1;
     }
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
     ///Config the CP2112 I/O for operation
     //printf("***Configure the CP2112 IO for operation***\n");
     buffer[0] = GETSETGPIOCONFIG;   // Get/Set GPIO config (feature Request)
@@ -129,7 +130,7 @@ int CP2112_HIDAPI::cp2112_configure()
     buffer[5] = 0x00;   //
     hidStatus = hid_send_feature_report(device, buffer, 6);
     /*
-    if(status == -1)
+    if(hidStatus == -1)
     {
         printf("failed to send GPIO config feature report\n");
     }
@@ -152,7 +153,7 @@ int CP2112_HIDAPI::set_gpio(uint8 mask, uint8 GPIO)
     buffer[0] = SET_GPIO;
     buffer[1] = GPIO;
     buffer[2] = mask;
-    hidStatus = hid_send_feature_report(device, buffer, 3);
+    hidStatus = hid_send_feature_report(device, buffer, 0x03);
     return hidStatus;
 }
 
@@ -164,7 +165,7 @@ int CP2112_HIDAPI::get_gpio(uint8 *data)
         return -1;
     }
     buffer[0] = GET_GPIO;
-    hidStatus = hid_get_feature_report(device, buffer, 2);
+    hidStatus = hid_get_feature_report(device, buffer, 0x02);
     *data = buffer[1];
     return hidStatus;
 }

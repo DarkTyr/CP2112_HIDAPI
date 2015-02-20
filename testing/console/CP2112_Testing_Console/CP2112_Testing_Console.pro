@@ -15,8 +15,8 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    ../../../src/windows/hid.c \
-    ../../../src/cp2112_hidapi.cpp
+    ../../../src/cp2112_hidapi.cpp \
+    ../../../src/windows/hid.c
 
 HEADERS += \
     ../../../include/hidapi.h \

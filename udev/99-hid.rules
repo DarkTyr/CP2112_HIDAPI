@@ -9,14 +9,14 @@
 # (one each way) for compatibility with older systems.
 
 # HIDAPI/libusb
-SUBSYSTEM=="usb", ATTRS{idVendor}=="04d8", ATTRS{idProduct}=="003f", MODE="0666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea90", MODE="0666"
 
 
 # If you are using the hidraw implementation, then do something like the
 # following, substituting the VID and PID with your device. Busnum 1 is USB.
 
 # HIDAPI/hidraw
-KERNEL=="hidraw*", ATTRS{busnum}=="1", ATTRS{idVendor}=="04d8", ATTRS{idProduct}=="003f", MODE="0666"
+KERNEL=="hidraw*", ATTRS{busnum}=="1", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea90", MODE="0666"
 
 # Once done, optionally rename this file for your device, and drop it into
 # /etc/udev/rules.d and unplug and re-plug your device. This is all that is
