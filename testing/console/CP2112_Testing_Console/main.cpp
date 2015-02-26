@@ -5,7 +5,7 @@
 #include <iomanip>
 
 /// need for sleep functionality
-#include <Windows.h>
+//#include <Windows.h>
 
 
 #include "../../../include/cp2112_hidapi.h"

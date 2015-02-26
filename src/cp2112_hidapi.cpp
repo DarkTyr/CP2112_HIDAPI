@@ -1,5 +1,5 @@
 #include "../include/cp2112_hidapi.h"
-#include <Windows.h>
+//#include <Windows.h>
 
 enum reportID
 {
