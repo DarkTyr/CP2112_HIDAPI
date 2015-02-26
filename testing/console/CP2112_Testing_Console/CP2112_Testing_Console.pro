@@ -35,6 +35,9 @@ win32: SOURCES += ../../../src/windows/hid.c
 #-------------------------------------------------
 macx: LIBS += -framework CoreFoundation -framework IOkit
 win32: LIBS += -lSetupAPI
+#link to the libudev library for hidraw HIDAPI
+unix: !macx: LIBS += -ludev
+#link to usb-1.0 for libusb HIDAPI
 #unix: !macx: LIBS += -lusb-1.0
 
 # -------------------------------------------------
@@ -62,3 +65,6 @@ win32 {
     UI_DIR = windows
     RCC_DIR = windows
 }
+
+DISTFILES += \
+    ../../../udev/hid-cp2112.rules
