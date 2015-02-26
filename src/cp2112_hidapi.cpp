@@ -48,6 +48,7 @@ CP2112_HIDAPI::CP2112_HIDAPI()
 }
 CP2112_HIDAPI::~CP2112_HIDAPI()
 {
+
     if(device == NULL)
     {
         ;
@@ -56,6 +57,7 @@ CP2112_HIDAPI::~CP2112_HIDAPI()
     {
         exit_device();
     }
+
     hid_exit();
 }
 

@@ -330,8 +330,7 @@ int main(int argc, char *argv[])
     cout << "TempI2C3: " << temp << endl;
     dTemp = double((buffer[1] << 8) + buffer[0])/100;
     cout << "TempI2C3: " << dTemp <<endl;
-
     EMU->exit_device();
-    delete EMU;
+    //delete EMU;
     return 0;
 }
