@@ -306,7 +306,7 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
         /// Read Transfer Status Report about the SMBus data writen
         memset((void*) &buffer[0], 0x00, sizeof(buffer));
         hidStatus = hid_read(device, buffer, 7);
-        if(buffer[0] == 0x16)
+        if(buffer[0] == XFER_STATUS_RESPONSE)
         {
             i2cStatus = buffer[1];
         }
@@ -327,7 +327,7 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
         memset((void*) &buffer[0], 0x00, sizeof(buffer));
         hidStatus = hid_read(device, buffer, 64);
 
-        if(buffer[0] == 0x13)
+        if(buffer[0] == DATA_READ_RESPONSE)
         {
             if(buffer[2] > 0x00)
             {
