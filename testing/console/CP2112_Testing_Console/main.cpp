@@ -323,13 +323,38 @@ int main(int argc, char *argv[])
     cout << "TempI2C4: " << temp <<endl;
     dTemp = double((buffer[1] << 8) + buffer[0])/100;
     cout << "TempI2C4: " << dTemp <<endl;
-    cout << uppercase  << noshowbase << hex << setfill('0') << setw(8);
-    cout << "  Buffer[0]: 0x" << +buffer[0] << endl;
-    cout << "  Buffer[1]: 0x" << +buffer[1] << endl;
-    temp = ((buffer[1] << 8) + buffer[0])/100;
-    cout << "TempI2C3: " << temp << endl;
-    dTemp = double((buffer[1] << 8) + buffer[0])/100;
-    cout << "TempI2C3: " << dTemp <<endl;
+
+
+
+
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x09;
+    buffer[1] = 0x10;
+    status = EMU->i2c_write(0x2A, 0x02, buffer);
+    cout << "EMU i2c_write result latice        : " << status << endl;
+
+
+
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x01;
+    status = EMU->i2c_write_read(0x2A, 0x01, 0x01, buffer);
+    cout << "EMU i2c_write_read result ADC       : " << status << endl;
+    printf("  Buffer[0]: %02hX\n", buffer[0]);
+    temp = buffer[0];
+    memset((void*) &buffer[0], 0x00, sizeof(buffer));
+    buffer[0] = 0x02;
+    status = EMU->i2c_write_read(0x2A, 0x01, 0x01, buffer);
+    cout << "EMU i2c_write_read result ADC       : " << status << endl;
+    printf("  Buffer[0]: %02hX\n", buffer[0]);
+    //temp = ((buffer[0] << 8) + temp)/100;
+    //cout << "Lattice VMON2 Voltage  : " << temp <<endl;
+
+
+
+
+
+
+
     EMU->exit_device();
     //delete EMU;
     return 0;
