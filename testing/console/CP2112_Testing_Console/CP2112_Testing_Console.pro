@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT      += core
+QT      -= core
 QT      -= gui
 
 TARGET  = CP2112_Testing_Console
