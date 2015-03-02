@@ -62,14 +62,25 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    status = EMU->cp2112_configure();
+    //status = EMU->cp2112_configure();
+
+    struct CP2112_HIDAPI::cp2112_configure_struct configuration;
+    configuration.clock_divider = 0x0000;
+    configuration.gpio0_txtoggle_en = 1;
+    configuration.gpio1_rxtoggle_en = 1;
+    configuration.gpio7_clk_en = 0;
+    configuration.gpio_nopendrain = 0x00;
+    configuration.gpio_output_ninput = 0xFF;
+    status = EMU->cp2112_configure(configuration);
+
     cout << "EMU CP2112_configure result : " << status << endl;
+
     status = EMU->SMBus_configure();
     cout << "EMU i2c_configure result    : " << status << endl;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x10;
-    buffer[1] = 0x55;
+    buffer[1] = 0x00;
     status = EMU->i2c_write(0xA4, 0x02, buffer);
     cout << "EMU i2c_write result Disable write protect        : " << status << endl;
 
@@ -122,6 +133,7 @@ int main(int argc, char *argv[])
     printf("Buffer[11]: %02hX\n", buffer[11]);
     printf("Buffer[12]: %02hX\n", buffer[12]);
 
+    EMU->verbosity = 1;
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0xF2;
     status = EMU->i2c_write_read(0xA4, 0x01, 0x20, buffer);
@@ -139,6 +151,8 @@ int main(int argc, char *argv[])
     printf("Buffer[10]: %02hX\n", buffer[10]);
     printf("Buffer[11]: %02hX\n", buffer[11]);
     printf("Buffer[12]: %02hX\n", buffer[12]);
+
+    EMU->verbosity = 0;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x00;
@@ -379,29 +393,25 @@ int main(int argc, char *argv[])
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x09;
     buffer[1] = 0x0D;
-    status = EMU->i2c_write(0x54, 0x02, buffer);
+    status = EMU->i2c_write(0x55, 0x02, buffer);
     cout << "EMU i2c_write result latice        : " << status << endl;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x07;
-    status = EMU->i2c_write_read(0x54, 0x01, 0x01, buffer);
+    status = EMU->i2c_write_read(0x55, 0x01, 0x01, buffer);
     cout << "EMU i2c_write_read result ADC D       : " << status << endl;
     printf("  Buffer[0]: %02hX\n", buffer[0]);
     temp = (buffer[0] >> 4);
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x08;
-    status = EMU->i2c_write_read(0x54, 0x01, 0x01, buffer);
+    status = EMU->i2c_write_read(0x55, 0x01, 0x01, buffer);
     cout << "EMU i2c_write_read result ADC D      : " << status << endl;
     printf("  Buffer[0]: %02hX\n", buffer[0]);
     dTemp = double((buffer[0] << 4) + temp)*2/1000;
     cout << dec;
     cout << "Lattice PVCCA Voltage  : " << dTemp << "V" <<endl;
     cout << hex;
-
-
-
-
 
     EMU->exit_device();
     //delete EMU;
