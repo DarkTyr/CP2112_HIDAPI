@@ -249,7 +249,7 @@ int CP2112_HIDAPI::i2c_write(uint8 i2cAddress, uint8 bytesToSend, uint8 *data)
     buffer[1] = 0x01;   //Request SMBus Transfer Status
     hidStatus = hid_write(device, buffer, 2);
 
-    while(i2cStatus == 0x00)
+    while(i2cStatus == I2C_RESULT::I2C_INPROGRESS)
     {    
         /// Read Transfer Status Report about the SMBus data writen
         memset((void*) &buffer[0], 0x00, sizeof(buffer));
@@ -284,7 +284,7 @@ int CP2112_HIDAPI::i2c_read(uint8 i2cAddress, uint8 bytesToRecieve, uint8 *data)
     i2cStatus = 0x00;
 
 
-    while(i2cStatus == 0x00)
+    while(i2cStatus == I2C_RESULT::I2C_INPROGRESS)
     {
         /// Send Transfer Status request
         buffer[0] = ReportID::XFER_STATUS_REQ;   // 0x15
@@ -360,7 +360,7 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
     buffer[1] = 0x01;   //Request SMBus Transfer Status
     hidStatus = hid_write(device, buffer, 2);
 
-    while(i2cStatus == 0x00)
+    while(i2cStatus == I2C_RESULT::I2C_INPROGRESS)
     {
 
         /// Read Transfer Status Report about the SMBus data writen
@@ -371,17 +371,23 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
             i2cStatus = xfer_status_response_proc();
             cp2112_bytesRead = (buffer[5] << 8) | (buffer[6] << 0);
         }
-        if(buffer[0])
+        if(i2cStatus == I2C_RESULT::I2C_INPROGRESS)
+        {
+            /// Send Transfer Status request
+            buffer[0] = ReportID::XFER_STATUS_REQ;   // 0x15
+            buffer[1] = 0x01;   //Request SMBus Transfer Status
+            hidStatus = hid_write(device, buffer, 2);
+        }
     }
 
-    if(i2cStatus < 0)
+    if(i2cStatus != I2C_RESULT::I2C_SUCCESS)
     {
-        return i2cStatus;
+        return -1;
     }
 
     while(bytesRead < bytesToRecieve)
     {
-        /// Send Transfer Status request
+        /// Send force data read request
         buffer[0] = ReportID::DATA_READ_FORCE;   // 0x12
         buffer[1] = 0x00;
         buffer[2] = 0xFF;   // Send upto 256 bytes please
@@ -399,11 +405,10 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
                 {
                     if(bytesToRecieve < cp2112_bytesRead)
                     {
-                        return I2C_RESULT::I2C_ARB_LOST;
+                        return I2C_RESULT::I2C_RD_INCOMPLETE;
                     }
                     for(recieveIndex = 0; recieveIndex < cp2112_bytesRead; recieveIndex++)
                     {
-
                         data[bytesRead] = buffer[recieveIndex + 3];
                         bytesRead++;
                     }
@@ -473,10 +478,7 @@ int CP2112_HIDAPI::xfer_status_response_proc()
             }
         }
     }
-    else if (buffer[0] == ReportID::XFER_STATUS_RESPONSE)
-    {
-        return 0;
-    }
+
     return 0;
 }
 
