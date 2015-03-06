@@ -1,7 +1,4 @@
 import hid
-from aifc import data
-
-
 
 class cp2112_hidapi:
     def __init__(self):
@@ -34,7 +31,8 @@ class cp2112_hidapi:
             'USB_USB_CONFIG': 0x21,
             'USB_MANU_STRING': 0x22,
             'USB_PRODUCT_STRING': 0x23,
-            'USB_SERIAL_STRING': 0x24}
+            'USB_SERIAL_STRING': 0x24
+            }
         
         self._smbusStatusGeneral = {
             0x00: 'BUS_IDLE',
@@ -46,8 +44,8 @@ class cp2112_hidapi:
         self._smbusStatusBusy = {
             0x00: 'I2C_ADDR_ACK',
             0x01: 'I2C_ADDR_NACK',
-            0x02: 'I2C_RD_PROGRESS',
-            0x03: 'I2C_WR_PROGRESS',
+            0x02: 'I2C_RD_INPROGRESS',
+            0x03: 'I2C_WR_INPROGRESS',
             0x05: 'I2C_SUCCESS'
             }
         
@@ -74,77 +72,201 @@ class cp2112_hidapi:
         
     def open_device(self):
         self.device.open(self.vid, self.pid)
-        if(device.error())
+        if(device.error()):
             return device.error()
         else:
             return 'Device Opened'
         
     def cp2112_configureGPIO(self):
-        buffer[0] = self._reportID['GETSETGPIOCONFIG']
-        buffer[1] = 0xFF
-        buffer[2] = 0x00
-        buffer[3] = 0x06
-        buffer[4] = 0x00
-        buffer[5] = 0x00
+        if(not self.device_check()):
+            return 'No Device Open'
+        
+        buffer = []
+        buffer.append(self._reportID['GETSETGPIOCONFIG'])
+        buffer.append(0xFF)
+        buffer.append(0x00)
+        buffer.append(0x06)
+        buffer.append(0x00)
+        buffer.append(0x00)
         self.hidstatus = self.device.send_feature_report(buffer)
         return self.hidstatus
     
     def cp2112_configureSMBus(self):
-        buffer[00] = self._reportID['GETSETSMBUSCONFIG']
-        buffer[01] = 0x00
-        buffer[02] = 0x01
-        buffer[03] = 0x86
-        buffer[04] = 0xA0
-        buffer[05] = 0x02
-        buffer[06] = 0x00
-        buffer[07] = 0x03
-        buffer[08] = 0xE8
-        buffer[09] = 0x03
-        buffer[10] = 0xE8
-        buffer[11] = 0x00
-        buffer[12] = 0x00
-        buffer[13] = 0x00
+        if(not self.device_check()):
+            return 'No Device Open'
+        
+        buffer = []
+        buffer.append(self._reportID['GETSETSMBUSCONFIG'])
+        buffer.append(0x00)
+        buffer.append(0x01)
+        buffer.append(0x86)
+        buffer.append(0xA0)
+        buffer.append(0x02)
+        buffer.append(0x00)
+        buffer.append(0x03)
+        buffer.append(0xE8)
+        buffer.append(0x03)
+        buffer.append(0xE8)
+        buffer.append(0x00)
+        buffer.append(0x00)
+        buffer.append(0x00)
         self.hidstatus = self.device.send_feature_report(buffer)
         return self.hidstatus
     
     def get_gpio(self, gpio):
         if(not self.device_check()):
-            return 'No Device'
+            return 'No Device Open'
         
-        buffer[0] = self._reportID['GET_GPIO']
-        self.hidstatus = self.device.get_feature_report(buffer, 0x02)
+        buffer = []
+        buffer.append(self._reportID['GET_GPIO'])
+        buffer = self.device.get_feature_report(0x02)
         if(buffer[0] == self._reportID['GET_GPIO']):
             gpio = buffer[1]
             return 'Success'
         else:
-            return 'Did not get feature report back'
+            return 'Did not get GET_GPIO feature report back'
     
     def set_gpio(self, gpio, mask):
         if(not self.device_check()):
-            return 'No Device'
+            return 'No Device Open'
         
-        buffer[0] = self._reportID['SET_GPIO']
-        buffer[1] = gpio
-        buffer[2] = mask
+        buffer = []
+        buffer.append(self._reportID['SET_GPIO'])
+        buffer.append(gpio)
+        buffer.append(mask)
         self.hidstatus = self.device.send_feature_report(buffer, len(buffer))
-        return 'Success'
+        if(self.hidstatus > 0):
+            return 'Success'
+        else:
+            return 'Failed to write to Device'
     
     def smbus_write(self, i2cAddress, bytesToSend, data):
         if(not self.device_check()):
-            return 'No Device'
+            return 'No Device Open'
         
-        buffer[0] = self._reportID['DATA_WRITE']
-        buffer[1] = i2cAddress
-        buffer[2] = bytesToSend
-        buffer[3:] = data[:]
-        self.hidstatus = self.device.send_feature_report(buffer, len(buffer))
-        return 'Success'
+        buffer = []
+        buffer.append(self._reportID['DATA_WRITE'])
+        buffer.append(i2cAddress)
+        buffer.append(bytesToSend)
+        for i in range(bytesToSend):
+            buffer.append(data[i])
         
+        self.hidstatus = self.device.write(buffer, len(buffer))
+        self.i2cstatus = 'Status 1: BUSS_BUSY Status 2: I2C_WR_INPROGRESS'
+        status = 'Status 1: BUSS_BUSY Status 2: I2C_WR_INPROGRESS'
+        
+        while(self.i2cstatus == status):
+            buffer = []
+            buffer.append(self._reportID['XFER_STATUS_REQ'])
+            buffer.append(0x01)
+            self.hidstatus = self.device.write(buffer)
+            if(self.hidstatus < 0):
+                return 'Unable to write to device'
+            buffer = self.device.read(0x07)
+            self.xfer_status_response(buffer)
+        return self.i2cstatus
+            
     def smbus_read(self, i2cAddress, bytesToRead, data):
+        if(not self.device_check()):
+            return 'No Device Open'
+        
+        buffer = []
+        buffer.append(self._reportID['DATA_READ'])
+        buffer.append(i2cAddress)
+        buffer.append((bytesToRead >> 8) & 0xFF)
+        buffer.append((bytesToRead >> 0) & 0xFF)
+        self.hidstatus = self.device.write(buffer)
+        
+        self.i2cstatus = 'Status 1: BUSS_BUSY Status 2: I2C_WR_INPROGRESS'
+        status = 'Status 1: BUSS_BUSY Status 2: I2C_WR_INPROGRESS'
+        
+        while(i2cstatus == status):
+            buffer = []
+            buffer.append(self._reportID['XFER_STATUS_REQ'])
+            buffer.append(0x01)
+            self.hidstatus = self.device.write(buffer)
+            if(self.hidstatus < 0):
+                return 'Unable to write to device'
+            buffer = self.device.read(0x07)
+            hidBytesRead = self.xfer_status_response(buffer)
+            
+        status = 'Status 1: BUS_GOOD Status 2: I2C_SUCCESS'
+        if(bytesToRead != hidBytesRead):
+            return self.i2cstatus
+        
+        bytesRead = 0
+        while(bytesRead < bytesToRead):
+            buffer = []
+            buffer.append(self._reportID['DATA_READ_FORCE'])
+            buffer.append(0x00)
+            buffer.append(0xFF)
+            self.hidstatus = self.device.write(buffer)
+            
+            buffer = self.device.read(0xFF)
+            hidBytesRead = self.xfer_status_response(buffer)
+            if(buffer[0] == self._reportID['DATA_READ_RESPONSE']):
+                if(buffer[2] > 0x00):
+                    for x in range(3, buffer[2] + 3):
+                        data[bytesRead] = buffer[x] 
+                        bytesRead += 1
+        if(bytesRead == bytesToRead):
+            return 'Success'
+        else:
+            return 'Fail'
         
     def smbus_write_read(self, i2cAddress,bytesToSend, bytesToRead, data):
+        if(not self.device_check()):
+            return 'No Device Open'
+        
+        buffer = []
+        buffer.append(self._reportID['DATA_WRITE_READ'])
+        buffer.append(i2cAddress)
+        buffer.append((bytesToRead >> 8) & 0xFF)
+        buffer.append((bytesToRead >> 0) & 0xFF)
+        buffer.append(bytesToSend)
+        for i in range(bytesToSend):
+            buffer.append(data[i])
+
+        self.hidstatus = self.device.write(buffer)
+        
+        self.i2cstatus = 'Status 1: BUSS_BUSY Status 2: I2C_WR_INPROGRESS'
+        status = 'Status 1: BUSS_BUSY Status 2: I2C_WR_INPROGRESS'
+        while(i2cstatus == status):
+            buffer = []
+            buffer.append(self._reportID['XFER_STATUS_REQ'])
+            buffer.append(0x01)
+            self.hidstatus = self.device.write(buffer)
+            if(self.hidstatus < 0):
+                return 'Unable to write to device'
+            buffer = self.device.read(0x07)
+            hidBytesRead = self.xfer_status_response(buffer)
+            
+        status = 'Status 1: BUS_GOOD Status 2: I2C_SUCCESS'
+        if(bytesToRead != hidBytesRead):
+            return self.i2cstatus
+        bytesRead = 0
+        
+        while(bytesRead < bytesToRead):
+            buffer = []
+            buffer.append(self._reportID['DATA_READ_FORCE'])
+            buffer.append(0x00)
+            buffer.append(0xFF)
+            self.hidstatus = self.device.write(buffer)
+            
+            buffer = self.device.read(0xFF)
+            hidBytesRead = self.xfer_status_response(buffer)
+            if(buffer[0] == self._reportID['DATA_READ_RESPONSE']):
+                if(buffer[2] > 0x00):
+                    for x in range(3, buffer[2] + 3):
+                        data[bytesRead] = buffer[x]
+                        bytesRead += 1
+        if(bytesRead == bytesToRead):
+            return 'Success'
+        else:
+            return 'Fail'
         
     def exit_device(self):
+        self.device.close();
         
     def xfer_status_response(self, data):
         if(data[0] != self._reportID['XFER_STATUS_RESPONSE']):
@@ -154,17 +276,18 @@ class cp2112_hidapi:
         
         if(status1 == 'BUS_IDLE'):
             status2 = self._smbusStatusBusy[data[2]]
-        if else(status1 == 'BUS_BUSY'):
+        elif (status1 == 'BUS_BUSY'):
             status2 = self._smbusStatusBusy[data[2]]
-        if else(status1 == 'BUS_GOOD'):
+        elif (status1 == 'BUS_GOOD'):
             status2 = self._smbusStatusError[data[2]]
-        if else(status1 == 'BUS_ERROR'):
+        elif (status1 == 'BUS_ERROR'):
             status2 = self._smbusStatusError[data[2]]
-        else
+        else:
+            return -1
         
         self.i2cstatus = 'Status 1: ' + status1 + ' Status 2: ' + status2
         
-        if(status1 = 'BUS_GOOD' and status2 = 'I2C_SUCCESS'):
+        if((status1 == 'BUS_GOOD') and (status2 == 'I2C_SUCCESS')):
             return (data[5] << 8 | data[6])
         
         

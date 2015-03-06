@@ -244,15 +244,17 @@ int CP2112_HIDAPI::i2c_write(uint8 i2cAddress, uint8 bytesToSend, uint8 *data)
     hidStatus = hid_write(device, buffer, bytesToSend + 3);
 
 
-    /// Send Transfer Status request
+
     i2cStatus = I2C_RESULT::I2C_INPROGRESS;
-    memset((void*) &buffer[0], 0x00, sizeof(buffer));
-    buffer[0] = ReportID::XFER_STATUS_REQ;   // 0x15
-    buffer[1] = 0x01;   //Request SMBus Transfer Status
-    hidStatus = hid_write(device, buffer, 2);
 
     while(i2cStatus == I2C_RESULT::I2C_INPROGRESS)
-    {    
+    {
+        /// Send Transfer Status request
+        memset((void*) &buffer[0], 0x00, sizeof(buffer));
+        buffer[0] = ReportID::XFER_STATUS_REQ;   // 0x15
+        buffer[1] = 0x01;   //Request SMBus Transfer Status
+        hidStatus = hid_write(device, buffer, 2);
+
         /// Read Transfer Status Report about the SMBus data writen
         memset((void*) &buffer[0], 0x00, sizeof(buffer));
         hidStatus = hid_read(device, buffer, 7);
