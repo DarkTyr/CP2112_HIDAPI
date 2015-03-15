@@ -194,8 +194,8 @@ class CP2112_HIDAPI:
             hidBytesRead = self.xfer_status_response(buffer)
             
         status = 'Status 1: BUS_GOOD Status 2: I2C_SUCCESS'
-        if(bytesToRead != hidBytesRead):
-            return self.i2cstatus
+        #if(bytesToRead != hidBytesRead):
+        #    return self.i2cstatus
         
         data = []
         bytesRead = 0
