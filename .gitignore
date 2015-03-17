@@ -31,3 +31,6 @@ Makefile*
 *.autosave
 *.pro.user
 *.pro.user*
+
+#Generated python files
+*.pyc
