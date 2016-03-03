@@ -59,7 +59,7 @@ class CP2112_HIDAPI:
             }
         
     
-    def deviceCheck(self):
+    def device_check(self):
         for y in hid.enumerate():       
             if(self.vid == y['vendor_id']):
                 if(self.pid == y['product_id']):
@@ -270,7 +270,7 @@ class CP2112_HIDAPI:
             return 'Fail', [0x00]
         
     def exitDevice(self):
-        self._device.close();
+        self._device.close()
         
     def _xfer_status_response(self, data):
         if(data[0] != self._reportID['XFER_STATUS_RESPONSE']):
