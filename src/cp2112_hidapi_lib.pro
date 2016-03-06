@@ -23,9 +23,9 @@ win32: SOURCES += windows/hid.c
 macx: LIBS += -framework CoreFoundation -framework IOkit
 win32: LIBS += -lSetupAPI
 #link to the libudev library for hidraw HIDAPI
-unix: !macx: LIBS += -ludev
+#unix: !macx: LIBS += -ludev
 #link to usb-1.0 for libusb HIDAPI
-#unix: !macx: LIBS += -lusb-1.0
+unix: !macx: LIBS += -lusb-1.0
 
 # -------------------------------------------------
 # Make sure output directory for object file and
