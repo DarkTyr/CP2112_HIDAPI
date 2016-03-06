@@ -68,7 +68,7 @@ class CP2112_HIDAPI:
                     None
             else:
                 None
-        return ''
+        return 'could not match VID'
         
     def openDevice(self):
         self._device.open(self.vid, self.pid)
@@ -147,8 +147,11 @@ class CP2112_HIDAPI:
         buffer.append(self._reportID['DATA_WRITE'])
         buffer.append(i2cAddress)
         buffer.append(bytesToSend)
-        for i in range(bytesToSend):
-            buffer.append(data[i])
+        if bytesToSend > 1:
+            for i in range(bytesToSend):
+                buffer.append(data[i])
+        else:
+            buffer.append(data)
 
         self.hidstatus = self._device.write(buffer)
         self.i2cstatus = 'Status 1: BUSS_BUSY Status 2: I2C_WR_INPROGRESS'
@@ -295,8 +298,3 @@ class CP2112_HIDAPI:
             return (data[5] << 8 | data[6])
         else:
             return 1
-        
-        
-        
-        
-        

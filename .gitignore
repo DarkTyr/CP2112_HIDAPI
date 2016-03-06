@@ -21,13 +21,13 @@
 *.app
 
 #build Files
-
 *.ilk
 *.pdb
 *.ilk
 *.exp
 Makefile*
 
+#QT user config files
 *.autosave
 *.pro.user
 *.pro.user*
@@ -40,3 +40,4 @@ Makefile*
 
 #cython-hidapi
 cython-hidapi/
+
