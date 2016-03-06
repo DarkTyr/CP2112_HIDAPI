@@ -34,3 +34,9 @@ Makefile*
 
 #Generated python files
 *.pyc
+
+#PyCharm directory
+.idea/
+
+#cython-hidapi
+cython-hidapi/
