@@ -160,23 +160,23 @@ class MAX31785:
             }
 
     def maxPageChange(self, pagestr):
-        strStatus, data = self.device.smbus_write(self.address, self.reportlen['PAGE'], self.pageid[pagestr])
+        strStatus, data = self.device.smbus_write(self.address, self.reportlen['PAGE'] + 1, [self.reportid['PAGE']] + [self.pageid[pagestr]])
         return strStatus, data
 
     def maxWrite(self, reportstr, data):
         if(len(data) != self.reportlen[reportstr]):
             return 'Wrong amount of data for the report', [0x00]
         else:
-            strStatus, data = self.device.smbus_write(self.address, self.reportlen[reportstr], self.reportid[reportstr])
+            strStatus, data = self.device.smbus_write(self.address, self.reportlen[reportstr] + 1, [self.reportid[reportstr]] + data)
         
         return strStatus, data
 
     def maxRead(self, reportstr, pagestr = ''):
         if(pagestr == ''):
-            strStatus, data = self.device.smbus_write_read(self.address, 0x01, self.reportlen[reportstr], self.reportid[reportstr])
+            strStatus, data = self.device.smbus_write_read(self.address, 0x01, self.reportlen[reportstr], [self.reportid[reportstr]])
         else:
-            strStatus, data = self.device.smbus_write(self.address, self.reportlen['PAGE'], self.pageid[pagestr])
-            strStatus, data = self.device.smbus_write_read(self.address, 0x01, self.reportlen[reportstr], self.reportid[reportstr])
+            strStatus, data = self.device.smbus_write(self.address, self.reportlen['PAGE'] + 1, [self.pageid['PAGE']] + [self.pageid[pagestr]])
+            strStatus, data = self.device.smbus_write_read(self.address, 0x01, self.reportlen[reportstr], [self.reportid[reportstr]])
 
         return strStatus, data
     

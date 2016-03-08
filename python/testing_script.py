@@ -8,7 +8,7 @@ print 'configured the GPIO'
 device.configureSMBus()
 print 'configured the SMBus parameters'
 status, data = device.smbus_write(0xA4, 2, [0x00, 0x00])
-status, data = device.smbus_write_read(0xA4, 1, 20, 0xF2)
+status, data = device.smbus_write_read(0xA4, 1, 20, [0xF2])
 print 'Read MFR_FAN_LUT for fan channel 0'
 print 'Status: ' + status
 print 'Data'

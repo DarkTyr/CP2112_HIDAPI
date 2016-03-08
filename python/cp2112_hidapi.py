@@ -147,11 +147,9 @@ class CP2112_HIDAPI:
         buffer.append(self._reportID['DATA_WRITE'])
         buffer.append(i2cAddress)
         buffer.append(bytesToSend)
-        if bytesToSend > 1:
-            for i in range(bytesToSend):
-                buffer.append(data[i])
-        else:
-            buffer.append(data)
+
+        for i in range(0, bytesToSend):
+            buffer.append(data[i])
 
         self.hidstatus = self._device.write(buffer)
         self.i2cstatus = 'Status 1: BUSS_BUSY Status 2: I2C_WR_INPROGRESS'
@@ -232,19 +230,13 @@ class CP2112_HIDAPI:
         buffer.append((bytesToRead >> 0) & 0xFF)
         buffer.append(bytesToSend)
 
-        if bytesToSend > 1:
-            for i in range(bytesToSend):
-                buffer.append(data[i])
-        else:
-            buffer.append(data)
+        for i in range(0, bytesToSend):
+            buffer.append(data[i])
+
         self.hidstatus = self._device.write(buffer)
-        print self.hidstatus
 
         self.i2cstatus = 'Status 1: BUS_BUSY Status 2: I2C_WR_INPROGRESS'
         status = 'Status 1: BUS_BUSY Status 2: I2C_WR_INPROGRESS'
-
-        print self.i2cstatus
-        print status
 
         while(self.i2cstatus == status):
             buffer = []
@@ -256,8 +248,6 @@ class CP2112_HIDAPI:
             buffer = self._device.read(0x07)
             hidBytesRead = self._xfer_status_response(buffer)
 
-            print self.i2cstatus
-            
         status = 'Status 1: BUS_GOOD Status 2: I2C_SUCCESS'
         #if(bytesToRead != hidBytesRead):
         #    return 'Was not able to read all of the Bytes', [self.i2cstatus]
@@ -265,11 +255,11 @@ class CP2112_HIDAPI:
         
         data = []
         while(bytesRead < bytesToRead):
-            print bytesRead, bytesToRead
             buffer = []
             buffer.append(self._reportID['DATA_READ_FORCE'])
             buffer.append(0x00)
             buffer.append(0xFF)
+            self.hidstatus = self._device.write(buffer)
 
             buffer = self._device.read(0xFF)
             hidBytesRead = self._xfer_status_response(buffer)
@@ -278,7 +268,6 @@ class CP2112_HIDAPI:
                     for x in range(3, buffer[2] + 3):
                         data.append(buffer[x])
                         bytesRead += 1
-                        print 'a byte has been read'
                         
         if(bytesRead == bytesToRead):
             return 'Success', data
