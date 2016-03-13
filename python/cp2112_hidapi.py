@@ -1,37 +1,55 @@
 import hid
 
+
 class CP2112_HIDAPI:
     def __init__(self):
-        self.vid = 0x10C4 #stock CP2112 VID
-        self.pid = 0xEA90 #Stock CP2112 PID
+        self.vid = 0x10C4  # stock CP2112 VID
+        self.pid = 0xEA90  # Stock CP2112 PID
         self.serial = None
         self._device = hid.device()
         
         self.hidstatus = 0x00
         self.i2cstatus = ''
-        
+        '''
+        General Purpose IO Configuration Parameters
+        '''
+        self.conf_gpio_direction = 0xFF  # 0:input 1:output
+        self.conf_gpio_push_pull = 0x00  # 0:Open-drain 1:Push-pull
+        self.conf_gpio_special = 0x06  # 1:GPIO7 Clk output 2:GPIO0 TX pin 4:GPIO1 RX pin
+        self.conf_gpio_clock_divider = 0  # GPIO7_clk_freqency = 48MHz/(2xclock_divider)
+        '''
+        SMBus configuration Parameters
+        '''
+        self.conf_smbus_speed_hz = 100000  # 100kHz
+        self.conf_smbus_device_address = 0x02  # Address 1, LSB is masked
+        self.conf_smbus_autosend_read = 0x00  # 0:Disable 1:Enable (not supported)
+        self.conf_smbus_write_timeout = 1000  # 1 second timeout
+        self.conf_smbus_read_timeout = 1000  # 1 second timeout
+        self.conf_smbus_scl_low_timeout = 0  # disabled
+        self.conf_smbus_retry_time = 0  # 0 retries
+
         self._reportID = {
-            'RESET_DEVICE'      : 0x01,
-            'GETSETGPIOCONFIG'  : 0x02,
-            'GET_GPIO'          : 0x03,
-            'SET_GPIO'          : 0x04,
-            'GET_VER_INFO'      : 0x05,
-            'GETSETSMBUSCONFIG' : 0x06,
+            'RESET_DEVICE'          : 0x01,
+            'GETSETGPIOCONFIG'      : 0x02,
+            'GET_GPIO'              : 0x03,
+            'SET_GPIO'              : 0x04,
+            'GET_VER_INFO'          : 0x05,
+            'GETSETSMBUSCONFIG'     : 0x06,
             
-            'DATA_READ'         : 0x10,
-            'DATA_WRITE_READ'   : 0x11,
-            'DATA_READ_FORCE'   : 0x12,
-            'DATA_READ_RESPONSE': 0x13,
-            'DATA_WRITE'        : 0x14,
-            'XFER_STATUS_REQ'   : 0x15,
-            'XFER_STATUS_RESPONSE': 0x16,
-            'CANCEL_TRANSFER'   : 0x17,
+            'DATA_READ'             : 0x10,
+            'DATA_WRITE_READ'       : 0x11,
+            'DATA_READ_FORCE'       : 0x12,
+            'DATA_READ_RESPONSE'    : 0x13,
+            'DATA_WRITE'            : 0x14,
+            'XFER_STATUS_REQ'       : 0x15,
+            'XFER_STATUS_RESPONSE'  : 0x16,
+            'CANCEL_TRANSFER'       : 0x17,
             
-            'USB_LOCK'          : 0x20,
-            'USB_USB_CONFIG'    : 0x21,
-            'USB_MANU_STRING'   : 0x22,
-            'USB_PRODUCT_STRING': 0x23,
-            'USB_SERIAL_STRING' : 0x24
+            'USB_LOCK'              : 0x20,
+            'USB_USB_CONFIG'        : 0x21,
+            'USB_MANU_STRING'       : 0x22,
+            'USB_PRODUCT_STRING'    : 0x23,
+            'USB_SERIAL_STRING'     : 0x24
             }
         
         self._smbusStatusGeneral = {
@@ -57,27 +75,30 @@ class CP2112_HIDAPI:
             0x04: 'I2C_WR_INCOMPLETE',
             0x05: 'I2C_SUCCESS'
             }
-        
-    
+
     def device_check(self):
-        for y in hid.enumerate():       
+        for y in hid.enumerate():
             if(self.vid == y['vendor_id']):
                 if(self.pid == y['product_id']):
-                    return 'true'
+                    if(self._device.hid_device != None):
+                        return 'true'
+                    else:
+                        None
                 else:
                     None
             else:
                 None
+
         return 'could not match VID'
         
-    def openDevice(self):
+    def open_device(self):
         self._device.open(self.vid, self.pid)
         if(self._device.error()):
             return self._device.error()
         else:
             return 'Device Opened'
         
-    def configureGPIO(self):
+    def configure_gpio(self):
         if(not self.device_check()):
             return 'No Device Open'
         
@@ -91,29 +112,43 @@ class CP2112_HIDAPI:
         self.hidstatus = self._device.send_feature_report(buffer)
         return self.hidstatus
     
-    def configureSMBus(self):
+    def configure_smbus(self):
         if(not self.device_check()):
             return 'No Device Open'
         
         buffer = []
         buffer.append(self._reportID['GETSETSMBUSCONFIG'])
-        buffer.append(0x00)
-        buffer.append(0x01)
-        buffer.append(0x86)
-        buffer.append(0xA0)
-        buffer.append(0x02)
-        buffer.append(0x00)
-        buffer.append(0x03)
-        buffer.append(0xE8)
-        buffer.append(0x03)
-        buffer.append(0xE8)
-        buffer.append(0x00)
-        buffer.append(0x00)
-        buffer.append(0x00)
+        # buffer.append(0x00)
+        # buffer.append(0x01)
+        # buffer.append(0x86)
+        # buffer.append(0xA0)
+        # buffer.append(0x02)
+        # buffer.append(0x00)
+        # buffer.append(0x03)
+        # buffer.append(0xE8)
+        # buffer.append(0x03)
+        # buffer.append(0xE8)
+        # buffer.append(0x00)
+        # buffer.append(0x00)
+        # buffer.append(0x00)
+        buffer.append((self.conf_smbus_speed_hz >> 24) & 0xFF)
+        buffer.append((self.conf_smbus_speed_hz >> 16) & 0xFF)
+        buffer.append((self.conf_smbus_speed_hz >>  8) & 0xFF)
+        buffer.append((self.conf_smbus_speed_hz >> 00) & 0xFF)
+        buffer.append((self.conf_smbus_device_address >> 00) & 0xFF)
+        buffer.append((self.conf_smbus_autosend_read >> 00) & 0xFF)
+        buffer.append((self.conf_smbus_write_timeout >>  8) & 0xFF)
+        buffer.append((self.conf_smbus_write_timeout >> 00) & 0xFF)
+        buffer.append((self.conf_smbus_read_timeout >>  8) & 0xFF)
+        buffer.append((self.conf_smbus_read_timeout >> 00) & 0xFF)
+        buffer.append((self.conf_smbus_scl_low_timeout >> 00) & 0xFF)
+        buffer.append((self.conf_smbus_retry_time >>  8) & 0xFF)
+        buffer.append((self.conf_smbus_retry_time >> 00) & 0xFF)
+
         self.hidstatus = self._device.send_feature_report(buffer)
         return self.hidstatus
     
-    def getGPIO(self):
+    def get_gpio(self):
         if(not self.device_check()):
             return 'No Device Open'
         
@@ -124,8 +159,9 @@ class CP2112_HIDAPI:
             return gpio
         else:
             return ''
-    
-    def setGPIO(self, gpio, mask):
+
+    def set_gpio(self, gpio, mask):
+
         if(not self.device_check()):
             return 'No Device Open'
         
@@ -272,7 +308,7 @@ class CP2112_HIDAPI:
         else:
             return 'Fail', [0x00]
         
-    def exitDevice(self):
+    def exit_device(self):
         self._device.close()
         
     def _xfer_status_response(self, data):
