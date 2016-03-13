@@ -3,10 +3,10 @@ import cp2112_hidapi
 class Energy_Management_Unit:
     def __init__(self):
         self._device = cp2112_hidapi.CP2112_HIDAPI()
-        self._fan = MAX31785()
-        self._manager = LPTM10()
-        self._fan.device = self._device
-        self._manager.device = self._device
+        self.fan = MAX31785()
+        self.manager = LPTM10()
+        self.fan.device = self._device
+        self.manager.device = self._device
 
 
 class MAX31785:
@@ -159,6 +159,8 @@ class MAX31785:
             'PAGE_ALL'              : 0xFF
             }
 
+        self.invpageid = {v: k for k, v in self.pageid.items()}
+
     def maxPageChange(self, pagestr):
         strStatus, data = self.device.smbus_write(self.address, self.reportlen['PAGE'] + 1, [self.reportid['PAGE']] + [self.pageid[pagestr]])
         return strStatus, data
@@ -168,7 +170,7 @@ class MAX31785:
             return 'Wrong amount of data for the report', [0x00]
         else:
             strStatus, data = self.device.smbus_write(self.address, self.reportlen[reportstr] + 1, [self.reportid[reportstr]] + data)
-        
+
         return strStatus, data
 
     def maxRead(self, reportstr, pagestr = ''):
@@ -177,6 +179,9 @@ class MAX31785:
         else:
             strStatus, data = self.device.smbus_write(self.address, self.reportlen['PAGE'] + 1, [self.pageid['PAGE']] + [self.pageid[pagestr]])
             strStatus, data = self.device.smbus_write_read(self.address, 0x01, self.reportlen[reportstr], [self.reportid[reportstr]])
+
+        if(reportstr == 'PAGE'):
+            data = self.invpageid[data]
 
         return strStatus, data
     
