@@ -2,10 +2,10 @@ import cp2112_hidapi
 print 'creating device object for interaction'
 device = cp2112_hidapi.CP2112_HIDAPI()
 device.device_check()
-device.openDevice()
-device.configureGPIO()
+device.open_device()
+device.configure_gpio()
 print 'configured the GPIO'
-device.configureSMBus()
+device.configure_smbus()
 print 'configured the SMBus parameters'
 status, data = device.smbus_write(0xA4, 2, [0x00, 0x00])
 status, data = device.smbus_write_read(0xA4, 1, 20, [0xF2])

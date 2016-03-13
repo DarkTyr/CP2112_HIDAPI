@@ -2,11 +2,47 @@ import cp2112_hidapi
 
 class Energy_Management_Unit:
     def __init__(self):
-        self._device = cp2112_hidapi.CP2112_HIDAPI()
+        self.device = cp2112_hidapi.CP2112_HIDAPI()
         self.fan = MAX31785()
         self.manager = LPTM10()
-        self.fan.device = self._device
-        self.manager.device = self._device
+        self.fan.device = self.device
+        # self.manager.device = self._device
+
+    def init_device(self):
+
+        if(self.device.open_device()):
+            self.device.configure_gpio()
+            self.device.configure_smbus()
+            print 'Device has been opened and configured'
+        else:
+            print 'Device was not found'
+            return -1
+
+    def exit_device(self):
+        self.device.exit_device()
+        print 'Device has been closed'
+
+    def read_temps(self):
+        temps = []
+        '''Diode Temps first'''
+        status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_DIODE0')
+        temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
+        status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_DIODE1')
+        temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
+        '''Internal Temp of the Fan controller'''
+        status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_INT')
+        temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
+        '''Remote I2C temp sensors'''
+        status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_I2C0')
+        temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
+        status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_I2C1')
+        temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
+        status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_I2C2')
+        temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
+        status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_I2C3')
+        temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
+
+        return temps
 
 
 class MAX31785:
@@ -162,34 +198,41 @@ class MAX31785:
         self.invpageid = {v: k for k, v in self.pageid.items()}
 
     def maxPageChange(self, pagestr):
-        strStatus, data = self.device.smbus_write(self.address, self.reportlen['PAGE'] + 1, [self.reportid['PAGE']] + [self.pageid[pagestr]])
-        return strStatus, data
+        status, data = self.device.smbus_write(self.address, self.reportlen['PAGE'] + 1, [self.reportid['PAGE']]
+                                                  + [self.pageid[pagestr]])
+        return status, data
 
     def maxWrite(self, reportstr, data):
         if(len(data) != self.reportlen[reportstr]):
             return 'Wrong amount of data for the report', [0x00]
         else:
-            strStatus, data = self.device.smbus_write(self.address, self.reportlen[reportstr] + 1, [self.reportid[reportstr]] + data)
+            status, data = self.device.smbus_write(self.address, self.reportlen[reportstr] + 1, [self.reportid[reportstr]] + data)
 
-        return strStatus, data
+        return status, data
 
     def maxRead(self, reportstr, pagestr = ''):
         if(pagestr == ''):
-            strStatus, data = self.device.smbus_write_read(self.address, 0x01, self.reportlen[reportstr], [self.reportid[reportstr]])
+            status, data = self.device.smbus_write_read(self.address, 0x01, self.reportlen[reportstr], [self.reportid[reportstr]])
         else:
-            strStatus, data = self.device.smbus_write(self.address, self.reportlen['PAGE'] + 1, [self.pageid['PAGE']] + [self.pageid[pagestr]])
-            strStatus, data = self.device.smbus_write_read(self.address, 0x01, self.reportlen[reportstr], [self.reportid[reportstr]])
+            status, data = self.device.smbus_write(self.address, self.reportlen['PAGE'] + 1, [self.reportid['PAGE']]
+                                                  + [self.pageid[pagestr]])
+            if(status != 'Success'):
+                print 'A problem occurred during write: ' + status
+                return status, [0x00]
+
+            status, data = self.device.smbus_write_read(self.address, 0x01, self.reportlen[reportstr], [self.reportid[reportstr]])
 
         if(reportstr == 'PAGE'):
-            data = self.invpageid[data]
+            data = self.invpageid[data[0]]
 
-        return strStatus, data
+        return status, data
     
 
 class LPTM10:
     def __init__(self):
         self.device = cp2112_hidapi.CP2112_HIDAPI()
         self.mfr = 'Lattice Semiconductor'
+        self.address = 0x0A  # Configured at firmware compilation
         self.reportid = {
             'VMON_STATUS0'  : 0x00,
             'VMON_STATUS1'  : 0x01,
@@ -222,8 +265,12 @@ class LPTM10:
             'TRIM7_TRIM'    : 0x19,
             'TRIM8_TRIM'    : 0x1A
             }
-    def report(self, id):
-        return self._reportID[id]
-    
-        
+        self.reportlen = 1
+
+    def platformWrite(self):
+        status, data = self.device.smbus_write_read(self.address, self.reportlen + 1, [self.reportid['PAGE']])
+
+    def platformRead(self):
+        return None
+
     

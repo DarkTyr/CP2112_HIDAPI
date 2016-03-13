@@ -75,15 +75,12 @@ class CP2112_HIDAPI:
             0x04: 'I2C_WR_INCOMPLETE',
             0x05: 'I2C_SUCCESS'
             }
-
+        self.device = hid.device()
     def device_check(self):
         for y in hid.enumerate():
             if(self.vid == y['vendor_id']):
                 if(self.pid == y['product_id']):
-                    if(self._device.hid_device != None):
-                        return 'true'
-                    else:
-                        None
+                    return True
                 else:
                     None
             else:
@@ -99,7 +96,7 @@ class CP2112_HIDAPI:
             return 'Device Opened'
         
     def configure_gpio(self):
-        if(not self.device_check()):
+        if(self.device_check() != True):
             return 'No Device Open'
         
         buffer = []
@@ -153,12 +150,12 @@ class CP2112_HIDAPI:
             return 'No Device Open'
         
         buffer = []
-        buffer = self._device.get_feature_report(self._reportID['GET_GPIO'],0x02)
+        buffer = self._device.get_feature_report(self._reportID['GET_GPIO'], 0x02)
         if(buffer[0] == self._reportID['GET_GPIO']):
             gpio = buffer[1]
             return gpio
         else:
-            return ''
+            return None
 
     def set_gpio(self, gpio, mask):
 
