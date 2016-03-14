@@ -20,6 +20,14 @@ status, status1 = emu.device.smbus_write(0xF2, emu.fan.reportlen['PAGE']+1, [emu
 print status, status1
 status, status1 = emu.device.smbus_write(0xF2, emu.fan.reportlen['PAGE']+1, [emu.fan.reportid['PAGE']]+[emu.fan.pageid['PAGE_VOLT0']])
 print status, status1
+
+status, status1 = emu.device.smbus_write_read(0x54, 1, 1, [0x00])
+print status, status1
+status, status1 = emu.device.smbus_write_read(0x54, 1, 1, [0x01])
+print status, hex(status1[0])
+status, status1 = emu.device.smbus_write_read(0x54, 1, 1, [0x02])
+print status, status1
+
 #
 #
 # for x in range(1,256):

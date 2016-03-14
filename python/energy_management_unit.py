@@ -279,7 +279,7 @@ class LPTM10:
     def __init__(self):
         self.device = cp2112_hidapi.CP2112_HIDAPI()
         self.mfr = 'Lattice Semiconductor'
-        self.address = 0x0A  # Configured at firmware compilation
+        self.address = 0x54  # Configured at firmware compilation
         self.reportid = {
             'VMON_STATUS0'  : 0x00,
             'VMON_STATUS1'  : 0x01,
@@ -319,5 +319,3 @@ class LPTM10:
 
     def platformRead(self):
         return None
-
-    

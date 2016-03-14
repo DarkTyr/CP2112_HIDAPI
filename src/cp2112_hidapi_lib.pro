@@ -31,6 +31,27 @@ unix: !macx: LIBS += -lusb-1.0
 # Make sure output directory for object file and
 # library is in the correct subdirectory
 # -------------------------------------------------
+macx {
+    DESTDIR = mac
+    OBJECTS_DIR = mac
+    MOC_DIR = mac
+    UI_DIR = mac
+    RCC_DIR = mac
+}
+unix: !macx {
+    DESTDIR = linux
+    OBJECTS_DIR = linux
+    MOC_DIR = linux
+    UI_DIR = linux
+    RCC_DIR = linux
+}
+win32 {
+    DESTDIR = windows
+    OBJECTS_DIR = windows
+    MOC_DIR = windows
+    UI_DIR = windows
+    RCC_DIR = windows
+}
 
 DESTDIR = ../lib
 
