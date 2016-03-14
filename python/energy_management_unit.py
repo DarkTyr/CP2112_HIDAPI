@@ -24,25 +24,72 @@ class Energy_Management_Unit:
 
     def read_temps(self):
         temps = []
+
         '''Diode Temps first'''
         status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_DIODE0')
+        if status != 'Success':
+            return [-1]
         temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
+        if status != 'Success':
+            return [-1]
         status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_DIODE1')
+        if status != 'Success':
+            return [-1]
         temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
         '''Internal Temp of the Fan controller'''
         status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_INT')
+        if status != 'Success':
+            return [-1]
         temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
         '''Remote I2C temp sensors'''
         status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_I2C0')
+        if status != 'Success':
+            return [-1]
         temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
         status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_I2C1')
+        if status != 'Success':
+            return [-1]
         temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
         status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_I2C2')
+        if status != 'Success':
+            return [-1]
         temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
         status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_I2C3')
+        if status != 'Success':
+            return [-1]
         temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
 
         return temps
+
+    def read_fans(self):
+        rpm = []
+
+        status, data = self.fan.maxRead('READ_FAN_SPEED_1_2', 'PAGE_FAN0')
+        if status != 'Success':
+            return [-1]
+        rpm.append((data[1] << 8) | (data[0] << 0))
+        status, data = self.fan.maxRead('READ_FAN_SPEED_1_2', 'PAGE_FAN1')
+        if status != 'Success':
+            return [-1]
+        rpm.append((data[1] << 8) | (data[0] << 0))
+        status, data = self.fan.maxRead('READ_FAN_SPEED_1_2', 'PAGE_FAN2')
+        if status != 'Success':
+            return [-1]
+        rpm.append((data[1] << 8) | (data[0] << 0))
+        status, data = self.fan.maxRead('READ_FAN_SPEED_1_2', 'PAGE_FAN3')
+        if status != 'Success':
+            return [-1]
+        rpm.append((data[1] << 8) | (data[0] << 0))
+        status, data = self.fan.maxRead('READ_FAN_SPEED_1_2', 'PAGE_FAN4')
+        if status != 'Success':
+            return [-1]
+        rpm.append((data[1] << 8) | (data[0] << 0))
+        status, data = self.fan.maxRead('READ_FAN_SPEED_1_2', 'PAGE_FAN5')
+        if status != 'Success':
+            return [-1]
+        rpm.append((data[1] << 8) | (data[0] << 0))
+
+        return rpm
 
 
 class MAX31785:

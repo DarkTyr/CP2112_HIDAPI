@@ -201,7 +201,7 @@ class CP2112_HIDAPI:
         if(self.i2cstatus == 'Status 1: BUS_GOOD Status 2: I2C_SUCCESS'):
             return 'Success', [self.i2cstatus]
         else:
-            return 'Failed', [0x00]
+            return 'Failed', [self.i2cstatus]
             
     def smbus_read(self, i2cAddress, bytesToRead, data):
         if(not self.device_check()):
