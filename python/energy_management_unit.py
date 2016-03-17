@@ -6,7 +6,7 @@ class Energy_Management_Unit:
         self.fan = MAX31785()
         self.manager = LPTM10()
         self.fan.device = self.device
-        # self.manager.device = self._device
+        self.manager.device = self.device
 
     def init_device(self):
 
@@ -14,6 +14,7 @@ class Energy_Management_Unit:
             self.device.configure_gpio()
             self.device.configure_smbus()
             print 'Device has been opened and configured'
+            return 0
         else:
             print 'Device was not found'
             return -1
@@ -33,6 +34,26 @@ class Energy_Management_Unit:
         if status != 'Success':
             return [-1]
         status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_DIODE1')
+        if status != 'Success':
+            return [-1]
+        temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
+        status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_DIODE2')
+        if status != 'Success':
+            return [-1]
+        temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
+        if status != 'Success':
+            return [-1]
+        status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_DIODE3')
+        if status != 'Success':
+            return [-1]
+        temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
+        status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_DIODE4')
+        if status != 'Success':
+            return [-1]
+        temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
+        if status != 'Success':
+            return [-1]
+        status, data = self.fan.maxRead('READ_TEMPERATURE', 'PAGE_TEMP_DIODE5')
         if status != 'Success':
             return [-1]
         temps.append(((data[1] << 8) | (data[0] << 0))/100.0)
@@ -91,6 +112,48 @@ class Energy_Management_Unit:
 
         return rpm
 
+    def read_local_current(self):
+        local_currents = []
+
+        status, data = self.fan.maxRead('READ_VOUT', 'PAGE_VOLT2')
+        if status != 'Success':
+            return [-1]
+        local_currents.append((data[1] << 8) | (data[0] << 0))
+        status, data = self.fan.maxRead('READ_VOUT', 'PAGE_VOLT3')
+        if status != 'Success':
+            return [-1]
+        local_currents.append((data[1] << 8) | (data[0] << 0))
+        status, data = self.fan.maxRead('READ_VOUT', 'PAGE_VOLT4')
+        if status != 'Success':
+            return [-1]
+        local_currents.append((data[1] << 8) | (data[0] << 0))
+        status, data = self.fan.maxRead('READ_VOUT', 'PAGE_VOLT5')
+        if status != 'Success':
+            return [-1]
+        local_currents.append((data[1] << 8) | (data[0] << 0))
+
+        return local_currents
+
+    def config_fan(self):
+        self.fan.maxPageChange('PAGE_TEMP_DIODE2')
+        self.fan.maxWrite('MFR_TEMP_SENSOR_CONFIG', [0x00, 0x00])
+        self.fan.maxPageChange('PAGE_TEMP_DIODE3')
+        self.fan.maxWrite('MFR_TEMP_SENSOR_CONFIG', [0x00, 0x00])
+        self.fan.maxPageChange('PAGE_TEMP_DIODE4')
+        self.fan.maxWrite('MFR_TEMP_SENSOR_CONFIG', [0x00, 0x00])
+        self.fan.maxPageChange('PAGE_TEMP_DIODE5')
+        self.fan.maxWrite('MFR_TEMP_SENSOR_CONFIG', [0x00, 0x00])
+
+        self.fan.maxPageChange('PAGE_VOLT2')
+        self.fan.maxWrite('MFR_MODE', [0x00, 0x3C])
+        self.fan.maxPageChange('PAGE_VOLT3')
+        self.fan.maxWrite('MFR_MODE', [0x00, 0x3C])
+        self.fan.maxPageChange('PAGE_VOLT4')
+        self.fan.maxWrite('MFR_MODE', [0x00, 0x3C])
+        self.fan.maxPageChange('PAGE_VOLT5')
+        self.fan.maxWrite('MFR_MODE', [0x00, 0x3C])
+
+        return 0
 
 class MAX31785:
     def __init__(self):
@@ -314,8 +377,15 @@ class LPTM10:
             }
         self.reportlen = 1
 
-    def platformWrite(self):
-        status, data = self.device.smbus_write_read(self.address, self.reportlen + 1, [self.reportid['PAGE']])
+    def platformRead(self, report):
+        status, data = self.device.smbus_write_read(self.address, 0x01, self.reportlen, [self.reportid[report]])
+        if status != 'Success':
+            return [-1]
+        return data
 
-    def platformRead(self):
-        return None
+    def platformWrite(self, report, data):
+        status = self.device.smbus_write(self.address, self.reportlen + 0x01, [self.reportid[report]] + data)
+        # TODO: Always returns -1 for unknown reason but it does actually write
+        if status != 'Success':
+            return [-1]
+        return 0
