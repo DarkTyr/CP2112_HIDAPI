@@ -186,15 +186,16 @@ class CP2112_HIDAPI:
 
         self.hidstatus = self._device.write(buffer)
         self.i2cstatus = 'Status 1: BUSS_BUSY Status 2: I2C_WR_INPROGRESS'
-        status = 'Status 1: BUSS_BUSY Status 2: I2C_WR_INPROGRESS'
         
-        while(self.i2cstatus == status):
+        while(self.i2cstatus == 'Status 1: BUSS_BUSY Status 2: I2C_WR_INPROGRESS' or
+              self.i2cstatus == 'Status 1: BUS_IDLE Status 2: I2C_WR_INPROGRESS'):
+
             buffer = []
             buffer.append(self._reportID['XFER_STATUS_REQ'])
             buffer.append(0x01)
             self.hidstatus = self._device.write(buffer)
             if(self.hidstatus < 0):
-                return 'Unable to write to device', [0x00]
+                return 'Unable to write to device', [self.i2cstatus]
             buffer = self._device.read(0x07)
             self._xfer_status_response(buffer)
             
@@ -214,10 +215,11 @@ class CP2112_HIDAPI:
         buffer.append((bytesToRead >> 0) & 0xFF)
         self.hidstatus = self._device.write(buffer)
         
-        self.i2cstatus = 'Status 1: BUS_BUSY Status 2: I2C_WR_INPROGRESS'
-        status = 'Status 1: BUS_BUSY Status 2: I2C_WR_INPROGRESS'
+        self.i2cstatus = 'Status 1: BUS_BUSY Status 2: I2C_RD_INPROGRESS'
+
         
-        while(self.i2cstatus == status):
+        while(self.i2cstatus == 'Status 1: BUSS_BUSY Status 2: I2C_WR_INPROGRESS' or
+              self.i2cstatus == 'Status 1: BUS_IDLE Status 2: I2C_WR_INPROGRESS'):
             buffer = []
             buffer.append(self._reportID['XFER_STATUS_REQ'])
             buffer.append(0x01)
@@ -267,9 +269,10 @@ class CP2112_HIDAPI:
         self.hidstatus = self._device.write(buffer)
 
         self.i2cstatus = 'Status 1: BUS_BUSY Status 2: I2C_WR_INPROGRESS'
-        status = 'Status 1: BUS_BUSY Status 2: I2C_WR_INPROGRESS'
 
-        while(self.i2cstatus == status):
+        while(self.i2cstatus == 'Status 1: BUSS_BUSY Status 2: I2C_WR_INPROGRESS' or
+              self.i2cstatus == 'Status 1: BUS_IDLE Status 2: I2C_WR_INPROGRESS'):
+
             buffer = []
             buffer.append(self._reportID['XFER_STATUS_REQ'])
             buffer.append(0x01)
@@ -311,11 +314,11 @@ class CP2112_HIDAPI:
     def _xfer_status_response(self, data):
         if(data[0] != self._reportID['XFER_STATUS_RESPONSE']):
             return -1
-        
+        #  TODO: clean up the BUS_IDLE response and have it make sense
         status1 = self._smbusStatusGeneral[data[1]]
         
         if(status1 == 'BUS_IDLE'):
-            status2 = self._smbusStatusBusy[data[2]]
+           status2 = self._smbusStatusBusy[3]
         elif (status1 == 'BUS_BUSY'):
             status2 = self._smbusStatusBusy[data[2]]
         elif (status1 == 'BUS_GOOD'):

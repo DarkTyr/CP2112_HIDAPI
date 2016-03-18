@@ -377,15 +377,14 @@ class LPTM10:
             }
         self.reportlen = 1
 
-    def platformRead(self, report):
+    def platform_read(self, report):
         status, data = self.device.smbus_write_read(self.address, 0x01, self.reportlen, [self.reportid[report]])
         if status != 'Success':
-            return [-1]
-        return data
+            return status, data
+        return status, data
 
-    def platformWrite(self, report, data):
-        status = self.device.smbus_write(self.address, self.reportlen + 0x01, [self.reportid[report]] + data)
-        # TODO: Always returns -1 for unknown reason but it does actually write
+    def platform_write(self, report, data):
+        status, data = self.device.smbus_write(self.address, self.reportlen + 0x01, [self.reportid[report]] + data)
         if status != 'Success':
-            return [-1]
-        return 0
+            return status, data
+        return status, data
