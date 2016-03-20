@@ -35,22 +35,30 @@ for x in xrange(0, 0x0E):
     mux = (1 << 4) + x
     status, status1 = emu.manager.platform_write('ADC_MUX', [mux])
     #print status, status1
-    time.sleep(0.25)
+    time.sleep(0.001)
     status, data0 = emu.manager.platform_read('ADC_VALUE_LOW')
     status, data1 = emu.manager.platform_read('ADC_VALUE_HIGH')
     voltage = 2/1000.0 * ((data1[0] << 4) + ((data0[0] & 0xF0) >> 4))
     print 'Voltage ADC_MUX = ' + repr(x) + ' : ' + repr(voltage)
 
-#
-#
-# for x in range(1,256):
-#     status, status1 = emu.device.smbus_write(x, 2, [0x00, 0x00])
-#     print status, status1, hex(x)
-#     if status == 'Success':
-#         print 'Found i2C device at address: ' + hex(x)
-#     if status1 == 'Status 1: BUS_GOOD Status 2: I2C_SUCCESS':
-#         print 'Found i2C device at address: ' + hex(x)
+
+voltages = emu.manager.read_mux()
+for x in xrange(0, 0x0E):
+    print emu.manager.mux_str_decode[x], voltages[x]
+
+data_high, string_high = emu.manager.input_to_high()
+data_low, string_low = emu.manager.input_to_low()
+
+print data_high
+print data_low
+for x in xrange(0, 4):
+    if(data_high[x] == 1):
+        print 'Turn down the voltage on ' + string_high[x]
+    if(data_low[x] == 1):
+        print 'Turn up the voltage on ' + string_low[x]
 
 
+status, data = emu.manager.platform_read('VMON_STATUS1')
+print bin(data[0]), hex(data[0])
 print 'That is all for now folks, closing the HID device'
 emu.device.exit_device()

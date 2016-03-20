@@ -1,4 +1,5 @@
 import cp2112_hidapi
+import time
 
 class Energy_Management_Unit:
     def __init__(self):
@@ -377,6 +378,24 @@ class LPTM10:
             }
         self.reportlen = 1
 
+        self.mux_conversion = [2, 2, 2, 2, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1]
+        self.mux_str_decode = [
+            'Vout_A5',
+            'Vout_D5',
+            'Vout_D3',
+            'Vout_D2',
+            'Vin_A5 ',
+            'Vin_D5 ',
+            'Vin_D3 ',
+            'Vin_D2 ',
+            'I_A5   ',
+            'I_D5   ',
+            'I_D3   ',
+            'I_D2   ',
+            'PVCCA  ',
+            'PVCCINP'
+            ]
+
     def platform_read(self, report):
         status, data = self.device.smbus_write_read(self.address, 0x01, self.reportlen, [self.reportid[report]])
         if status != 'Success':
@@ -388,3 +407,51 @@ class LPTM10:
         if status != 'Success':
             return status, data
         return status, data
+
+    def read_mux(self):
+        output = []
+        for x in xrange(0, 0x0E):
+            '''1 << 4 is to activate the Attenuator'''
+            mux = (1 << 4) + x
+            status, status1 = self.platform_write('ADC_MUX', [mux])
+            time.sleep(0.001)
+            status, data0 = self.platform_read('ADC_VALUE_LOW')
+            if status != 'Success':
+                return status, data0
+            status, data1 = self.platform_read('ADC_VALUE_HIGH')
+            if status != 'Success':
+                return status, data1
+            voltage = 2/1000.0 * ((data1[0] << 4) + ((data0[0] & 0xF0) >> 4)) * self.mux_conversion[x]
+            output.append(voltage)
+
+        return output
+
+    def input_to_high(self):
+        vin_str = ['Vin_A5', 'Vin_D5', 'Vin_D3', 'Vin_D2']
+        status, data = self.platform_read('VMON_STATUS1')
+        if status != 'Success':
+            return [-1, -1, -1, -1]
+
+        vin_A5_high = ((~data[0] >> 0) & 0x01)
+        vin_D5_high = ((~data[0] >> 2) & 0x01)
+        vin_D3_high = ((~data[0] >> 4) & 0x01)
+        vin_D2_high = ((~data[0] >> 6) & 0x01)
+
+        vin_high = [vin_A5_high, vin_D5_high, vin_D3_high, vin_D2_high]
+
+        return vin_high, vin_str
+
+    def input_to_low(self):
+        vin_str = ['Vin_A5', 'Vin_D5', 'Vin_D3', 'Vin_D2']
+        status, data = self.platform_read('VMON_STATUS1')
+        if status != 'Success':
+            return [-1, -1, -1, -1]
+
+        vin_A5_low = ((~data[0] >> 1) & 0x01)
+        vin_D5_low = ((~data[0] >> 2) & 0x01)
+        vin_D3_low = ((~data[0] >> 5) & 0x01)
+        vin_D2_low = ((~data[0] >> 7) & 0x01)
+
+        vin_low = [vin_A5_low, vin_D5_low, vin_D3_low, vin_D2_low]
+
+        return vin_low, vin_str
