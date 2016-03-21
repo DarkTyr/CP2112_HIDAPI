@@ -378,7 +378,7 @@ class LPTM10:
             }
         self.reportlen = 1
 
-        self.mux_conversion = [2, 2, 2, 2, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1]
+        self.mux_conversion = [2, 2, 2, 2, 3, 3, 3, 3, 1/0.3, 1/0.3, 1/0.3, 1/0.3, 1, 1]
         self.mux_str_decode = [
             'Vout_A5',
             'Vout_D5',
