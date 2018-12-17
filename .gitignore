@@ -38,6 +38,9 @@ Makefile*
 #PyCharm directory
 .idea/
 
+#VS Code
+.vscode
+
 #cython-hidapi
 cython-hidapi/
 
