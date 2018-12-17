@@ -64,6 +64,7 @@ CP2112_HIDAPI::CP2112_HIDAPI()
     hidStatus = 0;
     i2cStatus = 0;
     verbosity = 0;
+    addr_nack_retry = 10;
 }
 CP2112_HIDAPI::~CP2112_HIDAPI()
 {
@@ -266,15 +267,15 @@ int CP2112_HIDAPI::i2c_write(uint8 i2cAddress, uint8 bytesToSend, uint8 *data)
     return i2cStatus;
 }
 
-int CP2112_HIDAPI::i2c_read(uint8 i2cAddress, uint8 bytesToRecieve, uint8 *data)
+int CP2112_HIDAPI::i2c_read(uint8 i2cAddress, uint8 bytesToRecieve, uint8 *bytesReceived, uint8 *data)
 {
     hidStatus = deviceCheck();
     if (hidStatus < 0)
     {
         return -1;
     }
-    uint8 bytesRead = 0;
-    uint8 recieveIndex = 0;
+    uint16 bytesRead = 0;
+    uint16 recieveIndex = 0;
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     /// Send Data Write Read Request
     buffer[0] = ReportID::DATA_READ; //0x11
@@ -304,6 +305,10 @@ int CP2112_HIDAPI::i2c_read(uint8 i2cAddress, uint8 bytesToRecieve, uint8 *data)
         }
     }
 
+    if(i2cStatus != I2C_RESULT::I2C_SUCCESS)
+    {
+        return i2cStatus;
+    }
 
     while(bytesRead < bytesToRecieve)
     {
@@ -330,11 +335,11 @@ int CP2112_HIDAPI::i2c_read(uint8 i2cAddress, uint8 bytesToRecieve, uint8 *data)
             }
         }
     }
-
-    return bytesRead;
+    *bytesReceived = bytesRead;
+    return i2cStatus;
 }
 
-int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 bytesToRecieve, uint8 *data)
+int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 bytesToRecieve, uint8 *bytesRevieved, uint8 *data)
 {
     hidStatus = deviceCheck();
     if (hidStatus < 0)
@@ -344,6 +349,7 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
     uint16 bytesRead = 0;
     uint16 recieveIndex = 0;
     uint16 cp2112_bytesRead = 0;
+    uint16 addr_nacked_times = 0;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     /// Send Data Write Read Request
@@ -370,7 +376,7 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
 
         /// Read Transfer Status Report about the SMBus data writen
         memset((void*) &buffer[0], 0x00, sizeof(buffer));
-        hidStatus = hid_read_timeout(device, buffer, 7, 1000);
+        hidStatus = hid_read_timeout(device, buffer, 7, 4000);
         if(buffer[0] == ReportID::XFER_STATUS_RESPONSE)
         {
             i2cStatus = xfer_status_response_proc();
@@ -383,11 +389,21 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
             buffer[1] = 0x01;   //Request SMBus Transfer Status
             hidStatus = hid_write(device, buffer, 2);
         }
+        if(i2cStatus == I2C_RESULT::I2C_ADDR_NACK)
+        {
+            addr_nacked_times++;
+            // printf("addr_nacked_times = %d\n", addr_nacked_times);
+            if(addr_nacked_times >= addr_nack_retry)
+            {
+                break;
+            }
+            i2cStatus = I2C_RESULT::I2C_INPROGRESS;
+        }
     }
 
     if(i2cStatus != I2C_RESULT::I2C_SUCCESS)
     {
-        return -1;
+        return i2cStatus;
     }
 
     while(bytesRead < bytesToRecieve)
@@ -422,7 +438,9 @@ int CP2112_HIDAPI::i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 byt
         }
     }
 
-    return bytesRead;
+    *bytesRevieved = bytesRead;
+    //return bytesRead;
+    return i2cStatus;
 }
 
 int CP2112_HIDAPI::deviceCheck()
@@ -441,6 +459,13 @@ int CP2112_HIDAPI::deviceCheck()
 
 int CP2112_HIDAPI::xfer_status_response_proc()
 {
+    if(verbosity > 0)
+    {
+        printf("CP2112_HIDAPI::xfer_status_response_proc()\n");
+        printf("buffer[0], 0x%x\n", buffer[0]);
+        printf("buffer[1], 0x%x\n", buffer[1]);
+        printf("buffer[2], 0x%x\n", buffer[2]);
+    }
     if(buffer[0] == ReportID::XFER_STATUS_RESPONSE)
     {
         switch (buffer[1])

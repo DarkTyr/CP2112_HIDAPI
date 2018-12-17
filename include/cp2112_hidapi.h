@@ -97,13 +97,14 @@ public:
     int set_gpio(uint8 mask, uint8 GPIO);
     int get_gpio(uint8 *data);
     int i2c_write(uint8 i2cAddress, uint8 bytesToSend, uint8 *data);
-    int i2c_read(uint8 i2cAddress, uint8 bytesToRecieve, uint8 *data);
-    int i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 bytesToRecieve, uint8 *data);
+    int i2c_read(uint8 i2cAddress, uint8 bytesToRecieve, uint8 *bytesReceived, uint8 *data);
+    int i2c_write_read(uint8 i2cAddress, uint8 bytesToSend, uint8 bytesToRecieve, uint8 *bytesReceived, uint8 *data);
     int exit_device();
 
 
     hid_device_info device_info;
     uint verbosity;
+    uint addr_nack_retry;
 
 private:
     hid_device *device;
