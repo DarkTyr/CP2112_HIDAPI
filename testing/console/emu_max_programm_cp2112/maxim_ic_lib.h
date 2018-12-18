@@ -76,7 +76,7 @@ using namespace std;
 #define CMD_MFR_DATE                0x9D;   //#bytes = 8 result = 0x3130313031303130
 #define CMD_MRF_SERIAL              0x9E;   //#bytes = 8 result = 0x3130313031303130
 #define CMD_MFR_MODE                0xD1;   //#bytes = 2
-#define CMD_MFR_PEAK                0xD4;   //#bytes = 2
+#define CMD_MFR_VOUT_PEAK           0xD4;   //#bytes = 2
 #define CMD_MFR_TEMPERATURE_PEAK    0xD6;   //#bytes = 2
 #define CMD_MFR_VOUT_MIN            0xD7;   //#bytes = 2
 #define CMD_MFR_FAULT_RESPONSE      0xD9;   //#bytes = 1
@@ -150,56 +150,76 @@ namespace Maxim_IC
             double_t Ch5;
         } *PRPM_Double;
 
-        typedef struct DS7505_Data
+        typedef struct VOLTAGE_t
         {
-            uint8_t  D00_address;         //device address
-            uint8_t  D00_config;          //Configuration of DS7505
-            uint16_t D00_raw_temp;        //Raw bit value recieved from DS7505
-            double_t D00_double_temp;     //Converted value from DS7505
-            uint16_t D00_raw_HYST;        //Hystoretic temp raw value
-            double_t D00_double_HYST;     //Hystoretic temp in decimal value
-            uint16_t D00_raw_tos;         //Thermostat trip point hex value
-            double_t D00_double_tos;      //Thermostat Trip poing decimal
+            double_t vout_double;
+            uint16_t vout_raw;
+            double_t vout_peak_double;
+            uint16_t vout_peak_raw;
+            double_t vout_min_double;
+            uint16_t vout_min_raw;
+        } *PVOLTAGE_t;
 
-            uint8_t  D01_address;
-            uint8_t  D01_config;
-            uint16_t D01_raw_temp;
-            double_t D01_double_temp;
-            uint16_t D01_raw_HYST;
-            double_t D01_double_HYST;
-            uint16_t D01_raw_tos;
-            double_t D01_double_tos;
+        typedef struct VOLTAGE_STRUC
+        {
+            struct VOLTAGE_t Ch0;
+            struct VOLTAGE_t Ch1;
+            struct VOLTAGE_t Ch2;
+            struct VOLTAGE_t Ch3;
+            struct VOLTAGE_t Ch4;
+            struct VOLTAGE_t Ch5;
+        } *PVOLTAGE_STRUC;
 
-            uint8_t  D02_address;
-            uint8_t  D02_config;
-            uint16_t D02_raw_temp;
-            double_t D02_double_temp;
-            uint16_t D02_raw_HYST;
-            double_t D02_double_HYST;
-            uint16_t D02_raw_tos;
-            double_t D02_double_tos;
+        // typedef struct DS7505_Data
+        // {
+        //     uint8_t  D00_address;         //device address
+        //     uint8_t  D00_config;          //Configuration of DS7505
+        //     uint16_t D00_raw_temp;        //Raw bit value recieved from DS7505
+        //     double_t D00_double_temp;     //Converted value from DS7505
+        //     uint16_t D00_raw_HYST;        //Hystoretic temp raw value
+        //     double_t D00_double_HYST;     //Hystoretic temp in decimal value
+        //     uint16_t D00_raw_tos;         //Thermostat trip point hex value
+        //     double_t D00_double_tos;      //Thermostat Trip poing decimal
 
-            uint8_t  D03_address;
-            uint8_t  D03_config;
-            uint16_t D03_raw_temp;
-            double_t D03_double_temp;
-            uint16_t D03_raw_HYST;
-            double_t D03_double_HYST;
-            uint16_t D03_raw_tos;
-            double_t D03_double_tos;
+        //     uint8_t  D01_address;
+        //     uint8_t  D01_config;
+        //     uint16_t D01_raw_temp;
+        //     double_t D01_double_temp;
+        //     uint16_t D01_raw_HYST;
+        //     double_t D01_double_HYST;
+        //     uint16_t D01_raw_tos;
+        //     double_t D01_double_tos;
 
-            double_t DS7505_Tos;          //Tos setpoint that is read to set the setpoint
-            double_t DS7505_Hyst;         //Hyst setpoint that is read to set the setpoint
+        //     uint8_t  D02_address;
+        //     uint8_t  D02_config;
+        //     uint16_t D02_raw_temp;
+        //     double_t D02_double_temp;
+        //     uint16_t D02_raw_HYST;
+        //     double_t D02_double_HYST;
+        //     uint16_t D02_raw_tos;
+        //     double_t D02_double_tos;
 
-        } *PDS7505_Data;
+        //     uint8_t  D03_address;
+        //     uint8_t  D03_config;
+        //     uint16_t D03_raw_temp;
+        //     double_t D03_double_temp;
+        //     uint16_t D03_raw_HYST;
+        //     double_t D03_double_HYST;
+        //     uint16_t D03_raw_tos;
+        //     double_t D03_double_tos;
+
+        //     double_t DS7505_Tos;          //Tos setpoint that is read to set the setpoint
+        //     double_t DS7505_Hyst;         //Hyst setpoint that is read to set the setpoint
+
+        // } *PDS7505_Data;
 
     class MAXIM_IC_LIBSHARED_EXPORT MAX31785
     {
     public:
 
-        //static int program_MAX31785(CP2112_HIDAPI *handle);
+        static int program_MAX31785(CP2112_HIDAPI *handle);
 
-        //static int program_Commit(CP2112_HIDAPI *handle);
+        static int program_Commit(CP2112_HIDAPI *handle);
 
         static int fan_On(CP2112_HIDAPI *handle);
 
@@ -207,57 +227,59 @@ namespace Maxim_IC
 
         static int Get_Temps(TEMPS_DOUBLE &Temps_Double, TEMPS_RAW &Temps_Raw);
 
-        static int get_Temps(CP2112_HIDAPI *handle, TEMPS_DOUBLE &Temps_Double, TEMPS_RAW &Temps_Raw);
+        static int get_Temps(CP2112_HIDAPI *handle, TEMPS_DOUBLE *Temps_Double, TEMPS_RAW *Temps_Raw);
 
-        static int get_RPM(CP2112_HIDAPI *handle, RPM_DOUBLE &RPM_Double, RPM_RAW &RPM_Raw);
+        static int get_RPM(CP2112_HIDAPI *handle, RPM_DOUBLE *RPM_Double, RPM_RAW *RPM_Raw);
 
-    // private:
+        static int get_Volt(CP2112_HIDAPI *handle, VOLTAGE_STRUC *Voltage_structure);
 
-    //     static int program_Fan_Channel0(CP2112_HIDAPI *handle);
+    private:
 
-    //     static int program_Fan_Channel1(CP2112_HIDAPI *handle);
+        static int program_Fan_Channel0(CP2112_HIDAPI *handle);
 
-    //     static int program_Fan_Channel2(CP2112_HIDAPI *handle);
+        static int program_Fan_Channel1(CP2112_HIDAPI *handle);
 
-    //     static int program_Fan_Channel3(CP2112_HIDAPI *handle);
+        static int program_Fan_Channel2(CP2112_HIDAPI *handle);
 
-    //     static int program_Fan_Channel4(CP2112_HIDAPI *handle);
+        static int program_Fan_Channel3(CP2112_HIDAPI *handle);
 
-    //     static int program_Fan_Channel5(CP2112_HIDAPI *handle);
+        static int program_Fan_Channel4(CP2112_HIDAPI *handle);
 
-    //     static int program_Temp_Internal(CP2112_HIDAPI *handle);
+        static int program_Fan_Channel5(CP2112_HIDAPI *handle);
 
-    //     static int program_Temp_Sensor0(CP2112_HIDAPI *handle);
+        static int program_Temp_Internal(CP2112_HIDAPI *handle);
 
-    //     static int program_Temp_Sensor1(CP2112_HIDAPI *handle);
+        static int program_Temp_Sensor0(CP2112_HIDAPI *handle);
 
-    //     static int program_Temp_Sensor2(CP2112_HIDAPI *handle);
+        static int program_Temp_Sensor1(CP2112_HIDAPI *handle);
 
-    //     static int program_Temp_Sensor3(CP2112_HIDAPI *handle);
+        static int program_Temp_Sensor2(CP2112_HIDAPI *handle);
 
-    //     static int program_Temp_Sensor4(CP2112_HIDAPI *handle);
+        static int program_Temp_Sensor3(CP2112_HIDAPI *handle);
 
-    //     static int program_Temp_Sensor5(CP2112_HIDAPI *handle);
+        static int program_Temp_Sensor4(CP2112_HIDAPI *handle);
 
-    //     static int program_Temp_I2C1(CP2112_HIDAPI *handle);
+        static int program_Temp_Sensor5(CP2112_HIDAPI *handle);
 
-    //     static int program_Temp_I2C2(CP2112_HIDAPI *handle);
+        static int program_Temp_I2C1(CP2112_HIDAPI *handle);
 
-    //     static int program_Temp_I2C3(CP2112_HIDAPI *handle);
+        static int program_Temp_I2C2(CP2112_HIDAPI *handle);
 
-    //     static int program_Temp_I2C4(CP2112_HIDAPI *handle);
+        static int program_Temp_I2C3(CP2112_HIDAPI *handle);
 
-    //     static int program_Voltage0(CP2112_HIDAPI *handle);
+        static int program_Temp_I2C4(CP2112_HIDAPI *handle);
 
-    //     static int program_Voltage1(CP2112_HIDAPI *handle);
+        static int program_Voltage0(CP2112_HIDAPI *handle);
 
-    //     static int program_Voltage2(CP2112_HIDAPI *handle);
+        static int program_Voltage1(CP2112_HIDAPI *handle);
 
-    //     static int program_Voltage3(CP2112_HIDAPI *handle);
+        static int program_Voltage2(CP2112_HIDAPI *handle);
 
-    //     static int program_Voltage4(CP2112_HIDAPI *handle);
+        static int program_Voltage3(CP2112_HIDAPI *handle);
 
-    //     static int program_Voltage5(CP2112_HIDAPI *handle);
+        static int program_Voltage4(CP2112_HIDAPI *handle);
+
+        static int program_Voltage5(CP2112_HIDAPI *handle);
 
     };
 

@@ -23,16 +23,11 @@ int main()
     uint8 buffer[255] = {0x00};
     uint8 bytesRxed = 0;
 
-    // Temp variable to hold 16 bit values in for display
-    uint16 temp;
-    double dTemp;
-
     // status of HID call, anything less than zero is bad
     int status;
 
     // Enumerate and print the HID devices on the system
     struct hid_device_info *devs, *cur_dev;
-
 
     cout <<"***Enumerate all devices with VID 0x10C4***\n";
     devs = hid_enumerate(0x10C4, 0x0);
@@ -61,11 +56,13 @@ int main()
     struct Maxim_IC::TEMPS_RAW temps_raw;
     struct Maxim_IC::RPM_DOUBLE fanrpm_double;
     struct Maxim_IC::RPM_RAW fanrpm_raw;
+    struct Maxim_IC::VOLTAGE_STRUC voltage_structure;
 
     status = EMU->open_device(0x10c4, 0xea90);
     if (status < 0)
     {
         delete EMU;
+        delete fan_ctrl;
         return -1;
     }
 
@@ -99,7 +96,7 @@ int main()
     printf(" Buffer[0]: %02hX\n", buffer[0]);
 
 
-    fan_ctrl->get_Temps(EMU, temps_double, temps_raw);
+    fan_ctrl->get_Temps(EMU, &temps_double, &temps_raw);
     cout << "temps_double::int = " << temps_double.Int << endl;
     cout << "temps_double::ch0 = " << temps_double.Ch0 << endl;
     cout << "temps_double::ch1 = " << temps_double.Ch1 << endl;
@@ -112,15 +109,49 @@ int main()
     cout << "temps_double::D02 = " << temps_double.D02 << endl;
     cout << "temps_double::D03 = " << temps_double.D03 << endl;
 
-    fan_ctrl->get_RPM(EMU, fanrpm_double, fanrpm_raw);
+    fan_ctrl->get_RPM(EMU, &fanrpm_double, &fanrpm_raw);
     cout << "fanrpm_double::ch0 = " << fanrpm_double.Ch0 << endl;
     cout << "fanrpm_double::ch1 = " << fanrpm_double.Ch1 << endl;
     cout << "fanrpm_double::ch2 = " << fanrpm_double.Ch2 << endl;
     cout << "fanrpm_double::ch3 = " << fanrpm_double.Ch3 << endl;
     cout << "fanrpm_double::ch4 = " << fanrpm_double.Ch4 << endl;
     cout << "fanrpm_double::ch5 = " << fanrpm_double.Ch5 << endl;
+    EMU->verbosity = 0;
 
+    fan_ctrl->get_Volt(EMU, &voltage_structure);
+    cout << "volts_double::ch0::vout_double = " << voltage_structure.Ch0.vout_double << endl;
+    cout << "volts_double::ch1::vout_double = " << voltage_structure.Ch1.vout_double << endl;
+    cout << "volts_double::ch2::vout_double = " << voltage_structure.Ch2.vout_double << endl;
+    cout << "volts_double::ch3::vout_double = " << voltage_structure.Ch3.vout_double << endl;
+    cout << "volts_double::ch4::vout_double = " << voltage_structure.Ch4.vout_double << endl;
+    cout << "volts_double::ch5::vout_double = " << voltage_structure.Ch5.vout_double << endl;
+    cout << "volts_double::ch0::vout_min_double = " << voltage_structure.Ch0.vout_min_double << endl;
+    cout << "volts_double::ch1::vout_min_double = " << voltage_structure.Ch1.vout_min_double << endl;
+    cout << "volts_double::ch2::vout_min_double = " << voltage_structure.Ch2.vout_min_double << endl;
+    cout << "volts_double::ch3::vout_min_double = " << voltage_structure.Ch3.vout_min_double << endl;
+    cout << "volts_double::ch4::vout_min_double = " << voltage_structure.Ch4.vout_min_double << endl;
+    cout << "volts_double::ch5::vout_min_double = " << voltage_structure.Ch5.vout_min_double << endl;
+    cout << "volts_double::ch0::vout_peak_double = " << voltage_structure.Ch0.vout_peak_double << endl;
+    cout << "volts_double::ch1::vout_peak_double = " << voltage_structure.Ch1.vout_peak_double << endl;
+    cout << "volts_double::ch2::vout_peak_double = " << voltage_structure.Ch2.vout_peak_double << endl;
+    cout << "volts_double::ch3::vout_peak_double = " << voltage_structure.Ch3.vout_peak_double << endl;
+    cout << "volts_double::ch4::vout_peak_double = " << voltage_structure.Ch4.vout_peak_double << endl;
+    cout << "volts_double::ch5::vout_peak_double = " << voltage_structure.Ch5.vout_peak_double << endl;
+
+    status = fan_ctrl->program_MAX31785(EMU);
+    if(status != 0)
+    {
+        cout << "Something went wrong when programming the program_MAX31785" << endl;
+    }
+    else
+    {
+        cout << "program_MAX31785 worked" << endl;
+    }
+
+    // I believe by calling EMU->exit_device() it currently calls
+    // hid_exit() in the hidapi which internally seems to delete itself.
+    // Calling delete EMU causes a double free or corruption
     EMU->exit_device();
-    delete EMU;
+    delete fan_ctrl;
     return 0;
 }
