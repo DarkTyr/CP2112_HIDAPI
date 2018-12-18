@@ -161,34 +161,28 @@ namespace Maxim_IC
         {
             return status;
         }
-        /*
+
         //Change Page to all
         i2cNumBytesToTx = 0;
         buffer[i2cNumBytesToTx++] = CMD_PAGE;      //page command
         buffer[i2cNumBytesToTx++] = 0xFF;          //Enable Writes for all commands
-        status = I2C_DeviceWrite(handle, i2cAddress, i2cNumBytesToTx, i2cDataSend, &i2cNumBytesTxd,
-                    I2C_TRANSFER_OPTIONS_START_BIT | I2C_TRANSFER_OPTIONS_STOP_BIT | I2C_TRANSFER_OPTIONS_BREAK_ON_NACK);   //write page command
-
-        if (status != FT_OK)
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
         {
-            status = "Unable to set page to all";
             return status;
         }
 
         //set MFR mode
         i2cNumBytesToTx = 0;
-        buffer[i2cNumBytesToTx++] = CMD_MFR_MODE;      //page command
-        buffer[i2cNumBytesToTx++] = 0x0F;          //Low
+        buffer[i2cNumBytesToTx++] = CMD_MFR_MODE;   //page command
+        buffer[i2cNumBytesToTx++] = 0x3F;   //Low
         buffer[i2cNumBytesToTx++] = 0x00;  //high
-        status = I2C_DeviceWrite(handle, i2cAddress, i2cNumBytesToTx, i2cDataSend, &i2cNumBytesTxd,
-                    I2C_TRANSFER_OPTIONS_START_BIT | I2C_TRANSFER_OPTIONS_STOP_BIT | I2C_TRANSFER_OPTIONS_BREAK_ON_NACK);   //write page command
-
-        if (status != FT_OK)
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
         {
-            status = "Unable to set MFR Mode";
             return status;
         }
-        */
+
         return 0;
     }
 
@@ -2804,7 +2798,7 @@ namespace Maxim_IC
 
         i2cNumBytesToTx = 0;
         buffer[i2cNumBytesToTx++] = CMD_MFR_TEMP_SENSOR_CONFIG;
-        buffer[i2cNumBytesToTx++] = 0x3F;      //Data Low
+        buffer[i2cNumBytesToTx++] = 0x00;      //Data Low
         buffer[i2cNumBytesToTx++] = 0x00;		//Data high    0x8020
         status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
         if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
@@ -2873,7 +2867,7 @@ namespace Maxim_IC
 
         i2cNumBytesToTx = 0;
         buffer[i2cNumBytesToTx++] = CMD_MFR_TEMP_SENSOR_CONFIG;
-        buffer[i2cNumBytesToTx++] = 0x3F;      //Data Low
+        buffer[i2cNumBytesToTx++] = 0x00;      //Data Low
         buffer[i2cNumBytesToTx++] = 0x00;		//Data high    0x8020
         status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
         if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
@@ -2917,7 +2911,7 @@ namespace Maxim_IC
         uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
         /*
-        Disable and Configure Thermal diode 2
+        Disable and Configure Thermal diode 4
         */
 
         i2cNumBytesToTx = 0;
@@ -2942,7 +2936,7 @@ namespace Maxim_IC
 
         i2cNumBytesToTx = 0;
         buffer[i2cNumBytesToTx++] = CMD_MFR_TEMP_SENSOR_CONFIG;
-        buffer[i2cNumBytesToTx++] = 0x3F;      //Data Low
+        buffer[i2cNumBytesToTx++] = 0x00;      //Data Low
         buffer[i2cNumBytesToTx++] = 0x00;		//Data high    0x8020
         status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
         if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
@@ -3011,7 +3005,7 @@ namespace Maxim_IC
 
         i2cNumBytesToTx = 0;
         buffer[i2cNumBytesToTx++] = CMD_MFR_TEMP_SENSOR_CONFIG;
-        buffer[i2cNumBytesToTx++] = 0x3F;      //Data Low
+        buffer[i2cNumBytesToTx++] = 0x00;      //Data Low
         buffer[i2cNumBytesToTx++] = 0x00;		//Data high    0x8020
         status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
         if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)

@@ -4,6 +4,7 @@
 #include <iomanip>
 
 #include <stdint.h>
+#include <unistd.h>
 
 /// need for sleep functionality
 //#include <Windows.h>
@@ -104,6 +105,7 @@ int main()
     {
         cout << "reset_volt() worked" << endl;
     }
+
     status = fan_ctrl->get_Temps(EMU, &temps_double, &temps_raw);
     cout << "temps_double::int = " << temps_double.Int << endl;
     cout << "temps_double::ch0 = " << temps_double.Ch0 << endl;
@@ -127,6 +129,7 @@ int main()
     EMU->verbosity = 0;
 
     status =fan_ctrl->get_Volt(EMU, &voltage_structure);
+    cout << dec;
     cout << "volts_double::ch0::vout_double = " << voltage_structure.Ch0.vout_double << endl;
     cout << "volts_double::ch1::vout_double = " << voltage_structure.Ch1.vout_double << endl;
     cout << "volts_double::ch2::vout_double = " << voltage_structure.Ch2.vout_double << endl;
@@ -155,6 +158,50 @@ int main()
     {
         cout << "program_MAX31785 worked" << endl;
     }
+    sleep(10);
+    status = fan_ctrl->get_Temps(EMU, &temps_double, &temps_raw);
+    cout << "temps_double::int = " << temps_double.Int << endl;
+    cout << "temps_double::ch0 = " << temps_double.Ch0 << endl;
+    cout << "temps_double::ch1 = " << temps_double.Ch1 << endl;
+    cout << "temps_double::ch2 = " << temps_double.Ch2 << endl;
+    cout << "temps_double::ch3 = " << temps_double.Ch3 << endl;
+    cout << "temps_double::ch4 = " << temps_double.Ch4 << endl;
+    cout << "temps_double::ch5 = " << temps_double.Ch5 << endl;
+    cout << "temps_double::D00 = " << temps_double.D00 << endl;
+    cout << "temps_double::D01 = " << temps_double.D01 << endl;
+    cout << "temps_double::D02 = " << temps_double.D02 << endl;
+    cout << "temps_double::D03 = " << temps_double.D03 << endl;
+
+    status = fan_ctrl->get_RPM(EMU, &fanrpm_double, &fanrpm_raw);
+    cout << "fanrpm_double::ch0 = " << fanrpm_double.Ch0 << endl;
+    cout << "fanrpm_double::ch1 = " << fanrpm_double.Ch1 << endl;
+    cout << "fanrpm_double::ch2 = " << fanrpm_double.Ch2 << endl;
+    cout << "fanrpm_double::ch3 = " << fanrpm_double.Ch3 << endl;
+    cout << "fanrpm_double::ch4 = " << fanrpm_double.Ch4 << endl;
+    cout << "fanrpm_double::ch5 = " << fanrpm_double.Ch5 << endl;
+    EMU->verbosity = 0;
+
+    status =fan_ctrl->get_Volt(EMU, &voltage_structure);
+    cout << dec;
+    cout << "volts_double::ch0::vout_double = " << voltage_structure.Ch0.vout_double << endl;
+    cout << "volts_double::ch1::vout_double = " << voltage_structure.Ch1.vout_double << endl;
+    cout << "volts_double::ch2::vout_double = " << voltage_structure.Ch2.vout_double << endl;
+    cout << "volts_double::ch3::vout_double = " << voltage_structure.Ch3.vout_double << endl;
+    cout << "volts_double::ch4::vout_double = " << voltage_structure.Ch4.vout_double << endl;
+    cout << "volts_double::ch5::vout_double = " << voltage_structure.Ch5.vout_double << endl;
+    cout << "volts_double::ch0::vout_min_double = " << voltage_structure.Ch0.vout_min_double << endl;
+    cout << "volts_double::ch1::vout_min_double = " << voltage_structure.Ch1.vout_min_double << endl;
+    cout << "volts_double::ch2::vout_min_double = " << voltage_structure.Ch2.vout_min_double << endl;
+    cout << "volts_double::ch3::vout_min_double = " << voltage_structure.Ch3.vout_min_double << endl;
+    cout << "volts_double::ch4::vout_min_double = " << voltage_structure.Ch4.vout_min_double << endl;
+    cout << "volts_double::ch5::vout_min_double = " << voltage_structure.Ch5.vout_min_double << endl;
+    cout << "volts_double::ch0::vout_peak_double = " << voltage_structure.Ch0.vout_peak_double << endl;
+    cout << "volts_double::ch1::vout_peak_double = " << voltage_structure.Ch1.vout_peak_double << endl;
+    cout << "volts_double::ch2::vout_peak_double = " << voltage_structure.Ch2.vout_peak_double << endl;
+    cout << "volts_double::ch3::vout_peak_double = " << voltage_structure.Ch3.vout_peak_double << endl;
+    cout << "volts_double::ch4::vout_peak_double = " << voltage_structure.Ch4.vout_peak_double << endl;
+    cout << "volts_double::ch5::vout_peak_double = " << voltage_structure.Ch5.vout_peak_double << endl;
+
 
     // I believe by calling EMU->exit_device() it currently calls
     // hid_exit() in the hidapi which internally seems to delete itself.
