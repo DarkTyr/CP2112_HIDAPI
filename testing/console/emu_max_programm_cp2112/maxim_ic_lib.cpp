@@ -24,9 +24,6 @@ namespace Maxim_IC
         //uint32_t i2cNumBytesToRx = 0; // Initialize a counter for the recieve buffer and set to Zero
         //uint32_t i2cNumBytesRxd = 0;  // Initialize another counter for the number of bytes actually recieved and set to Zero
 
-
-
-
         //Disbale Write Protection
         i2cNumBytesToTx = 0;
         buffer[i2cNumBytesToTx++] = CMD_WRITE_PROTECT;  //page command
@@ -195,13 +192,23 @@ namespace Maxim_IC
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
         uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
-
+        //Disbale Write Protection
         i2cNumBytesToTx = 0;
-        buffer[i2cNumBytesToTx++] = CMD_STORE_DEFUALT_ALL;
-        return status;
+        buffer[i2cNumBytesToTx++] = CMD_WRITE_PROTECT;  //page command
+        buffer[i2cNumBytesToTx++] = 0x00;               //Enable Writes for all commands
         status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
         if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
         {
+            cout << "CMD_WRITE_PROTECT: status = " << status << endl;
+            return status;
+        }
+
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_STORE_DEFUALT_ALL;
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "failed CMD_STORE_DEFUALT_ALL: status = " << status << endl;
             return status;
         }
         
