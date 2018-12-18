@@ -19,11 +19,6 @@ using namespace std;
 //int main(int argc, char *argv[])
 int main()
 {
-
-    // Buffer to hold information being sent on the SMBus
-    uint8 buffer[255] = {0x00};
-    uint8 bytesRxed = 0;
-
     // status of HID call, anything less than zero is bad
     int status;
 

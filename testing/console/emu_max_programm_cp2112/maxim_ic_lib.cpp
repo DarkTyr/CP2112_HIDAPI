@@ -16,13 +16,10 @@ namespace Maxim_IC
     int MAX31785::program_MAX31785(CP2112_HIDAPI *handle)
     {
         //initial programming for the MAX31785
-        int status;
+        int status = -1;                // Variable to hold returned status
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
-        //uint32_t i2cNumBytesToRx = 0; // Initialize a counter for the recieve buffer and set to Zero
-        //uint32_t i2cNumBytesRxd = 0;  // Initialize another counter for the number of bytes actually recieved and set to Zero
 
         //Disbale Write Protection
         i2cNumBytesToTx = 0;
@@ -190,7 +187,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
         //Disbale Write Protection
         i2cNumBytesToTx = 0;
@@ -290,20 +286,16 @@ namespace Maxim_IC
     int MAX31785::fan_On(CP2112_HIDAPI *handle)
     {
         //Set GPIO5 open/high
-        int status;
-        int stringReturn;
+        int status = -1;
         status = handle->set_gpio(0x10 , 0x10);
-        status = 0;
         return status;
     }
 
     int MAX31785::fan_Off(CP2112_HIDAPI *handle)
     {
         //Set GPIO5 low
-        int status;
-        int stringReturn;
+        int status = -1;
         status = handle->set_gpio(0x10, 0x00);
-        status = 0;
         return status;
     }
 
@@ -1483,12 +1475,10 @@ namespace Maxim_IC
 
         //program fan channel 1 of the MAX31785 6 channel fan controller
 
-        int status;                   // Variable to hold the int to do comparisons on
-        uint8_t i2cAddress = 0xA4;            // Address of MAX31785 chip
-        uint8_t buffer[256] = {0x00};    // Initialize a data buffer and set to all Zeros
-        uint32_t i2cNumBytesToTx = 0;			// Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;			// Initialize another counter for the number of bytes actually sent and set to Zero
-
+        int status;                     // Variable to hold the int to do comparisons on
+        uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
+        uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
+        uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
 
         /*
         Program Fan channel 0
@@ -1701,7 +1691,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
 
         /*
@@ -1915,8 +1904,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
-
 
         /*
         Program Fan channel 3
@@ -2129,8 +2116,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
-
 
         /*
         Program Fan channel 4
@@ -2343,8 +2328,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
-
 
         /*
         Program Fan channel 5
@@ -2554,7 +2537,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
         /*
         Enable internal temp sensor
@@ -2637,7 +2619,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
         /*
         Enable and Configure Thermal diode 0
@@ -2704,11 +2685,11 @@ namespace Maxim_IC
     int MAX31785::program_Temp_Sensor1(CP2112_HIDAPI *handle)
     {
 
-        int status;                   // Variable to hold the int to do comparisons on
-        uint8_t i2cAddress = 0xA4;            // Address of MAX31785 chip
-        uint8_t buffer[256] = {0x00};    // Initialize a data buffer and set to all Zeros
-        uint32_t i2cNumBytesToTx = 0;			// Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;			// Initialize another counter for the number of bytes actually sent and set to Zero
+        int status;                     // Variable to hold the int to do comparisons on
+        uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
+        uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
+        uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
+
 
         /*
         Enable and Configure Thermal diode 1
@@ -2777,7 +2758,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
         /*
         Disable and Configure Thermal diode 2
@@ -2846,7 +2826,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
         /*
         Disable and Configure Thermal diode 3
@@ -2915,7 +2894,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
         /*
         Disable and Configure Thermal diode 4
@@ -2984,7 +2962,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
         /*
         Disable and Configure Thermal diode 5
@@ -3053,7 +3030,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
         /*
         Enable and Configure I2C temp sensor 0
@@ -3122,7 +3098,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
         /*
         Enable and Configure I2C temp sensor 1
@@ -3191,7 +3166,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
         /*
         Enable and Configure I2C temp sensor 2
@@ -3260,7 +3234,7 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
+
 
         /*
         Enable and Configure I2C temp sensor 3
@@ -3324,33 +3298,22 @@ namespace Maxim_IC
 
     int MAX31785::program_Voltage0(CP2112_HIDAPI *handle)
     {
-        int status;                     // Variable to hold the int to do comparisons on
-        uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
-        uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
-        uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
-
+        int status = 0;                 // Variable to hold the int to do comparisons on
         return status;
     }
 
     int MAX31785::program_Voltage1(CP2112_HIDAPI *handle)
     {
-        int status;                     // Variable to hold the int to do comparisons on
-        uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
-        uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
-        uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
-
+        int status = 0;                 // Variable to hold the int to do comparisons on
         return status;
     }
 
     int MAX31785::program_Voltage2(CP2112_HIDAPI *handle)
     {
-        int status;                     // Variable to hold the int to do comparisons on
+        int status = 0;                 // Variable to hold the int to do comparisons on
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
         /*
         Program Voltage Channel 2
@@ -3452,7 +3415,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
         /*
         Program Voltage Channel 3
@@ -3554,7 +3516,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
         /*
         Program Voltage Channel 2
@@ -3657,7 +3618,6 @@ namespace Maxim_IC
         uint8_t i2cAddress = 0xA4;      // Address of MAX31785 chip
         uint8_t buffer[256] = {0x00};   // Initialize a data buffer and set to all Zeros
         uint32_t i2cNumBytesToTx = 0;   // Initialize a counter for the buffer and set to Zero
-        uint32_t i2cNumBytesTxd = 0;    // Initialize another counter for the number of bytes actually sent and set to Zero
 
         /*
         Program Voltage Channel 5
