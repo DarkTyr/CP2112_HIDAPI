@@ -26,19 +26,19 @@ default: all
 all:  hid.o cp2112_hidapi.o maxim_ic_lib.o emu_program emu_housekeeping
 
 hid.o:
-	$(CC) $(CFLAGS) -fpermissive -c $(INC_DIR) ../../../src/linux/hid.c
+	$(CC) $(CFLAGS) $(INC_DIR) -fpermissive -c  ../../../src/linux/hid.c
 
 cp2112_hidapi.o:
-	$(CC) $(CFLAGS) -c $(INC_DIR) ../../../src/cp2112_hidapi.cpp
+	$(CC) $(CFLAGS) $(INC_DIR) -c ../../../src/cp2112_hidapi.cpp
 
 maxim_ic_lib.o:
-	$(CC) $(CFLAGS) -c $(INC_DIR) maxim_ic_lib.cpp
+	$(CC) $(CFLAGS) $(INC_DIR) -c maxim_ic_lib.cpp
 
 emu_program.o:
-	$(CC) $(CFLAGS) -c $(INC_DIR) emu_program.cpp
+	$(CC) $(CFLAGS) $(INC_DIR) -c emu_program.cpp
 
 emu_housekeeping.o:
-	$(CC) $(CFLAGS) -c $(INC_DIR) emu_housekeeping.cpp
+	$(CC) $(CFLAGS) $(INC_DIR) -c emu_housekeeping.cpp
 
 emu_program: emu_program.o
 	$(CC) $(CFLAGS) $(INC_DIR) -o emu_program emu_program.o maxim_ic_lib.o cp2112_hidapi.o hid.o $(LIB_LINK)
