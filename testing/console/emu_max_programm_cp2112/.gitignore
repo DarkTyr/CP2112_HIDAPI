@@ -1,3 +1,4 @@
 # Compiled Object files
-emu_max_programm_cp2112
+emu_program
+emu_housekeeping
 *.o
