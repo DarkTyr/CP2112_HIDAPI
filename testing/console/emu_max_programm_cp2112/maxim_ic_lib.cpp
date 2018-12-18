@@ -1076,6 +1076,195 @@ namespace Maxim_IC
         return 0;
     }
 
+    int MAX31785::reset_volt(CP2112_HIDAPI *handle)
+    {
+        int status;                     // i2cStatus return value
+        uint8_t i2cAddress = 0xA4;
+        uint8_t buffer[16] = {0x0};     // Initialize a data buffer and set to all Zeros
+        uint8_t i2cNumBytesToTx = 0;    // Initialize a counter for the buffer and set to Zero
+
+        /*
+          Read voltages of Channel 0
+        */
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_PAGE;      //page command
+        buffer[i2cNumBytesToTx++] = PAGE_VOLT_0;      //Set page to page 2
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "CMD_PAGE:PAGE_VOLT_0: status = " << status << endl;
+        }
+
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_MFR_VOUT_MIN;
+        buffer[i2cNumBytesToTx++] = 0x00;
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "PAGE_VOLT_0:CMD_MFR_VOUT_MIN: status = " << status << endl;
+        }
+
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_MFR_VOUT_PEAK;
+        buffer[i2cNumBytesToTx++] = 0x00;
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "PAGE_VOLT_0:CMD_MFR_VOUT_MIN: status = " << status << endl;
+        }
+
+        /*
+          Read voltages of Channel 1
+        */
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_PAGE;      //page command
+        buffer[i2cNumBytesToTx++] = PAGE_VOLT_1;      //Set page to page 2
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "CMD_PAGE:PAGE_VOLT_0: status = " << status << endl;
+        }
+
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_MFR_VOUT_MIN;
+        buffer[i2cNumBytesToTx++] = 0x00;
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "PAGE_VOLT_1:CMD_MFR_VOUT_MIN: status = " << status << endl;
+        }
+
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_MFR_VOUT_PEAK;
+        buffer[i2cNumBytesToTx++] = 0x00;
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "PAGE_VOLT_1:CMD_MFR_VOUT_MIN: status = " << status << endl;
+        }
+
+        /*
+          Read voltages of Channel 2
+        */
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_PAGE;      //page command
+        buffer[i2cNumBytesToTx++] = PAGE_VOLT_2;      //Set page to page 2
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "CMD_PAGE:PAGE_VOLT_2: status = " << status << endl;
+        }
+
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_MFR_VOUT_MIN;
+        buffer[i2cNumBytesToTx++] = 0x00;
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "PAGE_VOLT_2:CMD_MFR_VOUT_MIN: status = " << status << endl;
+        }
+
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_MFR_VOUT_PEAK;
+        buffer[i2cNumBytesToTx++] = 0x00;
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "PAGE_VOLT_2:CMD_MFR_VOUT_MIN: status = " << status << endl;
+        }
+        
+        /*
+          Read voltages of Channel 3
+        */
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_PAGE;      //page command
+        buffer[i2cNumBytesToTx++] = PAGE_VOLT_3;      //Set page to page 2
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "CMD_PAGE:PAGE_VOLT_3: status = " << status << endl;
+        }
+
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_MFR_VOUT_MIN;
+        buffer[i2cNumBytesToTx++] = 0x00;
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "PAGE_VOLT_3:CMD_MFR_VOUT_MIN: status = " << status << endl;
+        }
+
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_MFR_VOUT_PEAK;
+        buffer[i2cNumBytesToTx++] = 0x00;
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "PAGE_VOLT_3:CMD_MFR_VOUT_MIN: status = " << status << endl;
+        }
+
+        /*
+          Read voltages of Channel 4
+        */
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_PAGE;      //page command
+        buffer[i2cNumBytesToTx++] = PAGE_VOLT_4;      //Set page to page 2
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "CMD_PAGE:PAGE_VOLT_4: status = " << status << endl;
+        }
+
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_MFR_VOUT_MIN;
+        buffer[i2cNumBytesToTx++] = 0x00;
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "PAGE_VOLT_4:CMD_MFR_VOUT_MIN: status = " << status << endl;
+        }
+
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_MFR_VOUT_PEAK;
+        buffer[i2cNumBytesToTx++] = 0x00;
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "PAGE_VOLT_4:CMD_MFR_VOUT_MIN: status = " << status << endl;
+        }
+
+        /*
+          Read voltages of Channel 5
+        */
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_PAGE;      //page command
+        buffer[i2cNumBytesToTx++] = PAGE_VOLT_5;      //Set page to page 2
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "CMD_PAGE:PAGE_VOLT_5: status = " << status << endl;
+        }
+
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_MFR_VOUT_MIN;
+        buffer[i2cNumBytesToTx++] = 0x00;
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "PAGE_VOLT_5:CMD_MFR_VOUT_MIN: status = " << status << endl;
+        }
+
+        i2cNumBytesToTx = 0;
+        buffer[i2cNumBytesToTx++] = CMD_MFR_VOUT_PEAK;
+        buffer[i2cNumBytesToTx++] = 0x00;
+        status = handle->i2c_write(i2cAddress, i2cNumBytesToTx, buffer);
+        if (status != CP2112_HIDAPI::I2C_RESULT::I2C_SUCCESS)
+        {
+            cout << "PAGE_VOLT_5:CMD_MFR_VOUT_MIN: status = " << status << endl;
+        }
+        return 0;
+    }
+
     int MAX31785::program_Fan_Channel0(CP2112_HIDAPI *handle)
     {
 

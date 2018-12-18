@@ -233,6 +233,8 @@ namespace Maxim_IC
 
         static int get_Volt(CP2112_HIDAPI *handle, VOLTAGE_STRUC *Voltage_structure);
 
+        static int reset_volt(CP2112_HIDAPI *handle);
+
     private:
 
         static int program_Fan_Channel0(CP2112_HIDAPI *handle);

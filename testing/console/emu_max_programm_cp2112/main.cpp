@@ -95,8 +95,16 @@ int main()
     cout << "EMU i2c_write_read result Write protect status       : " << status << endl;
     printf(" Buffer[0]: %02hX\n", buffer[0]);
 
-
-    fan_ctrl->get_Temps(EMU, &temps_double, &temps_raw);
+    status = fan_ctrl->reset_volt(EMU);
+    if(status != 0)
+    {
+        cout << "Something went wrong when reset_volt()" << endl;
+    }
+    else
+    {
+        cout << "reset_volt() worked" << endl;
+    }
+    status = fan_ctrl->get_Temps(EMU, &temps_double, &temps_raw);
     cout << "temps_double::int = " << temps_double.Int << endl;
     cout << "temps_double::ch0 = " << temps_double.Ch0 << endl;
     cout << "temps_double::ch1 = " << temps_double.Ch1 << endl;
@@ -109,7 +117,7 @@ int main()
     cout << "temps_double::D02 = " << temps_double.D02 << endl;
     cout << "temps_double::D03 = " << temps_double.D03 << endl;
 
-    fan_ctrl->get_RPM(EMU, &fanrpm_double, &fanrpm_raw);
+    status = fan_ctrl->get_RPM(EMU, &fanrpm_double, &fanrpm_raw);
     cout << "fanrpm_double::ch0 = " << fanrpm_double.Ch0 << endl;
     cout << "fanrpm_double::ch1 = " << fanrpm_double.Ch1 << endl;
     cout << "fanrpm_double::ch2 = " << fanrpm_double.Ch2 << endl;
@@ -118,7 +126,7 @@ int main()
     cout << "fanrpm_double::ch5 = " << fanrpm_double.Ch5 << endl;
     EMU->verbosity = 0;
 
-    fan_ctrl->get_Volt(EMU, &voltage_structure);
+    status =fan_ctrl->get_Volt(EMU, &voltage_structure);
     cout << "volts_double::ch0::vout_double = " << voltage_structure.Ch0.vout_double << endl;
     cout << "volts_double::ch1::vout_double = " << voltage_structure.Ch1.vout_double << endl;
     cout << "volts_double::ch2::vout_double = " << voltage_structure.Ch2.vout_double << endl;
