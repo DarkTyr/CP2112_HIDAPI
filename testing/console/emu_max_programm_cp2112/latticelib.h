@@ -1,15 +1,11 @@
 #ifndef LATTICELIB_H
 #define LATTICELIB_H
 
-#include <QObject>
-#include <QString>
-#include <QVector>
-#include <Windows.h>
 #include <stdint.h>
 
 //! Headers for the FTDI driver and the libMPSSE_API
-#include "../FTDI_Driver/Windows/ftd2xx.h"
-#include "../libMPSSE_API/include/libMPSSE_i2c.h"
+#include "hidapi.h"
+#include "cp2112_hidapi.h"
 
 
 //This Libarary is to be used with the LPTM10-12107 208-ball ftBGA
@@ -52,18 +48,18 @@
 //ADC Mux definitions coresponding to each power rail
 //The atenuation bit is already taken into account
 //
-#define ADC_MUX_RAIL_IN_A5  0x14;
-#define ADC_MUX_RAIL_IN_D5  0x15;
-#define ADC_MUX_RAIL_IN_D3  0x16;
-#define ADC_MUX_RAIL_IN_D2  0x17;
-#define ADC_MUX_RAIL_OUT_A5 0x10;
-#define ADC_MUX_RAIL_OUT_D5 0x11;
-#define ADC_MUX_RAIL_OUT_D3 0x02;
-#define ADC_MUX_RAIL_OUT_D2 0x03;
-#define ADC_MUX_RAIL_CUR_A5 0x18;
-#define ADC_MUX_RAIL_CUR_D5 0x19;
-#define ADC_MUX_RAIL_CUR_D3 0x1A;
-#define ADC_MUX_RAIL_CUR_D2 0x1B;
+#define ADC_MUX_RAIL_IN_A5  0x14;   // Vmon5
+#define ADC_MUX_RAIL_IN_D5  0x15;   // Vmon6
+#define ADC_MUX_RAIL_IN_D3  0x16;   // Vmon7
+#define ADC_MUX_RAIL_IN_D2  0x17;   // Vmon8
+#define ADC_MUX_RAIL_OUT_A5 0x10;   // Vmon1
+#define ADC_MUX_RAIL_OUT_D5 0x11;   // Vmon2
+#define ADC_MUX_RAIL_OUT_D3 0x02;   // Vmon3
+#define ADC_MUX_RAIL_OUT_D2 0x03;   // Vmon4
+#define ADC_MUX_RAIL_CUR_A5 0x18;   // Vmon9
+#define ADC_MUX_RAIL_CUR_D5 0x19;   // Vmon10
+#define ADC_MUX_RAIL_CUR_D3 0x1A;   // Vmon11
+#define ADC_MUX_RAIL_CUR_D2 0x1B;   // Vmon12
 #define ADC_MUX_PVCCA       0x1C;
 #define ADC_MUX_PVCCINP     0x1D;
 

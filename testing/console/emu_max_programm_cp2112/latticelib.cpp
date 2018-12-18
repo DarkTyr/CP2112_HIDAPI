@@ -14,7 +14,6 @@
   *
   *
   *
-  *
   */
 
 #include "latticelib.h"
