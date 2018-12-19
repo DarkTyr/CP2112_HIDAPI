@@ -158,10 +158,10 @@ int main()
     #endif
     // Convert local current sense to Amps, returned voltage is in millivolts (mV)
     // 1V = 1A of current on the current sense, just need to convert to Volts
-    emu_hskp.local_3p3_I = voltage_structure.Ch4 / 1000;
-    emu_hskp.local_5p0_I = voltage_structure.Ch3 / 1000 - emu_hskp.local_3p3_I;
-    emu_hskp.local_9p0_I = voltage_structure.Ch2 / 1000 - emu_hskp.local_3p3_I - emu_hskp.local_5p0_I;
-    emu_hskp.local_fan_I = voltage_structure.Ch5 / 1000;
+    emu_hskp.local_3p3_I = voltage_structure.Ch4 / 1000.0;
+    emu_hskp.local_5p0_I = voltage_structure.Ch3 / 1000.0 - emu_hskp.local_3p3_I;
+    emu_hskp.local_9p0_I = voltage_structure.Ch2 / 1000.0 - emu_hskp.local_3p3_I - emu_hskp.local_5p0_I;
+    emu_hskp.local_fan_I = voltage_structure.Ch5 / 1000.0;
 
 
 
@@ -183,13 +183,13 @@ int main()
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x08;
     status = EMU->i2c_write_read(0x54, 0x01, 0x01, &bytesRxed, buffer);
-    dTemp = double((buffer[0] << 4) + temp)*2/1000;
+    dTemp = double((buffer[0] << 4) + temp)*2/1000.0;
     #ifdef PRINT_RAW
         cout << dec;
         cout << "Lattice VMON1 Voltage  : " << dTemp << "V" <<endl;
         cout << hex;
     #endif
-    emu_hskp.A5_Vout = dTemp * 2
+    emu_hskp.A5_Vout = dTemp * 2;
 
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
@@ -203,13 +203,13 @@ int main()
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x08;
     status = EMU->i2c_write_read(0x54, 0x01, 0x01, &bytesRxed, buffer);
-    dTemp = double((buffer[0] << 4) + temp)*2/1000;
+    dTemp = double((buffer[0] << 4) + temp)*2/1000.0;
     #ifdef PRINT_RAW
     cout << dec;
     cout << "Lattice VMON2 Voltage  : " << dTemp << "V" <<endl;
     cout << hex;
     #endif
-    emu_hskp.D5_Vout = dTemp * 2
+    emu_hskp.D5_Vout = dTemp * 2;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x09;
@@ -222,13 +222,13 @@ int main()
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x08;
     status = EMU->i2c_write_read(0x54, 0x01, 0x01, &bytesRxed, buffer);
-    dTemp = double((buffer[0] << 4) + temp)*2/1000;
+    dTemp = double((buffer[0] << 4) + temp)*2/1000.0;
     #ifdef PRINT_RAW
     cout << dec;
     cout << "Lattice VMON3 Voltage  : " << dTemp << "V" <<endl;
     cout << hex;
     #endif
-    emu_hskp.D3_Vout = dTemp * 2
+    emu_hskp.D3_Vout = dTemp * 2;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x09;
@@ -241,13 +241,13 @@ int main()
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x08;
     status = EMU->i2c_write_read(0x54, 0x01, 0x01, &bytesRxed, buffer);
-    dTemp = double((buffer[0] << 4) + temp)*2/1000;
+    dTemp = double((buffer[0] << 4) + temp)*2/1000.0;
     #ifdef PRINT_RAW
     cout << dec;
     cout << "Lattice VMON4 Voltage  : " << dTemp << "V" <<endl;
     cout << hex;
     #endif
-    emu_hskp.D2_Vout = dTemp * 2
+    emu_hskp.D2_Vout = dTemp * 2;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x09;
@@ -260,13 +260,13 @@ int main()
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x08;
     status = EMU->i2c_write_read(0x54, 0x01, 0x01, &bytesRxed, buffer);
-    dTemp = double((buffer[0] << 4) + temp)*2/1000;
+    dTemp = double((buffer[0] << 4) + temp)*2/1000.0;
     #ifdef PRINT_RAW
         cout << dec;
         cout << "Lattice VMON5 Voltage  : " << dTemp << "V" <<endl;
         cout << hex;
     #endif
-    emu_hskp.A5_Vin = dTemp * 3
+    emu_hskp.A5_Vin = dTemp * 3;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x09;
@@ -279,13 +279,13 @@ int main()
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x08;
     status = EMU->i2c_write_read(0x54, 0x01, 0x01, &bytesRxed, buffer);
-    dTemp = double((buffer[0] << 4) + temp)*2/1000;
+    dTemp = double((buffer[0] << 4) + temp)*2/1000.0;
     #ifdef PRINT_RAW
         cout << dec;
         cout << "Lattice VMON6 Voltage  : " << dTemp << "V" <<endl;
         cout << hex;
     #endif
-    emu_hskp.D5_Vin = dTemp * 3
+    emu_hskp.D5_Vin = dTemp * 3;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x09;
@@ -298,13 +298,13 @@ int main()
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x08;
     status = EMU->i2c_write_read(0x54, 0x01, 0x01, &bytesRxed, buffer);
-    dTemp = double((buffer[0] << 4) + temp)*2/1000;
+    dTemp = double((buffer[0] << 4) + temp)*2/1000.0;
     #ifdef PRINT_RAW
         cout << dec;
         cout << "Lattice VMON7 Voltage  : " << dTemp << "V" <<endl;
         cout << hex;
     #endif
-    emu_hskp.D3_Vin = dTemp * 3
+    emu_hskp.D3_Vin = dTemp * 3;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x09;
@@ -317,13 +317,13 @@ int main()
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x08;
     status = EMU->i2c_write_read(0x54, 0x01, 0x01, &bytesRxed, buffer);
-    dTemp = double((buffer[0] << 4) + temp)*2/1000;
+    dTemp = double((buffer[0] << 4) + temp)*2/1000.0;
     #ifdef PRINT_RAW
         cout << dec;
         cout << "Lattice VMON8 Voltage  : " << dTemp << "V" <<endl;
         cout << hex;
     #endif
-    emu_hskp.D2_Vin = dTemp * 3
+    emu_hskp.D2_Vin = dTemp * 3;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x09;
@@ -336,13 +336,13 @@ int main()
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x08;
     status = EMU->i2c_write_read(0x54, 0x01, 0x01, &bytesRxed, buffer);
-    dTemp = double((buffer[0] << 4) + temp)*2/1000;
+    dTemp = double((buffer[0] << 4) + temp)*2/1000.0;
     #ifdef PRINT_RAW
         cout << dec;
         cout << "Lattice VMON9 Voltage  : " << dTemp << "V" <<endl;
         cout << hex;
     #endif
-    emu_hskp.A5_Iout = dTemp * 10/3
+    emu_hskp.A5_Iout = dTemp * 10/3;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x09;
@@ -355,13 +355,13 @@ int main()
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x08;
     status = EMU->i2c_write_read(0x54, 0x01, 0x01, &bytesRxed, buffer);
-    dTemp = double((buffer[0] << 4) + temp)*2/1000;
+    dTemp = double((buffer[0] << 4) + temp)*2/1000.0;
     #ifdef PRINT_RAW
         cout << dec;
         cout << "Lattice VMON10 Voltage  : " << dTemp << "V" <<endl;
         cout << hex;
     #endif
-    emu_hskp.D5_Iout = dTemp * 10/3
+    emu_hskp.D5_Iout = dTemp * 10/3;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x09;
@@ -374,13 +374,13 @@ int main()
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x08;
     status = EMU->i2c_write_read(0x54, 0x01, 0x01, &bytesRxed, buffer);
-    dTemp = double((buffer[0] << 4) + temp)*2/1000;
+    dTemp = double((buffer[0] << 4) + temp)*2/1000.0;
     #ifdef PRINT_RAW
         cout << dec;
         cout << "Lattice VMON11 Voltage  : " << dTemp << "V" <<endl;
         cout << hex;
     #endif
-    emu_hskp.D3_Iout = dTemp * 10/3
+    emu_hskp.D3_Iout = dTemp * 10/3;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x09;
@@ -393,13 +393,13 @@ int main()
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x08;
     status = EMU->i2c_write_read(0x54, 0x01, 0x01, &bytesRxed, buffer);
-    dTemp = double((buffer[0] << 4) + temp)*2/1000;
+    dTemp = double((buffer[0] << 4) + temp)*2/1000.0;
     #ifdef PRINT_RAW
         cout << dec;
         cout << "Lattice VMON12 Voltage  : " << dTemp << "V" <<endl;
         cout << hex;
     #endif
-    emu_hskp.D2_Iout = dTemp * 10/3
+    emu_hskp.D2_Iout = dTemp * 10/3;
 
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x09;
@@ -413,7 +413,7 @@ int main()
     buffer[0] = 0x08;
     status = EMU->i2c_write_read(0x54, 0x01, 0x01, &bytesRxed, buffer);
 
-    dTemp = double((buffer[0] << 4) + temp)*2/1000;
+    dTemp = double((buffer[0] << 4) + temp)*2/1000.0.0.0;
     #ifdef PRINT_RAW
         cout << dec;
         cout << "Lattice PVCCA Voltage  : " << dTemp << "V" <<endl;
@@ -431,7 +431,7 @@ int main()
     memset((void*) &buffer[0], 0x00, sizeof(buffer));
     buffer[0] = 0x08;
     status = EMU->i2c_write_read(0x54, 0x01, 0x01, &bytesRxed, buffer);
-    dTemp = double((buffer[0] << 4) + temp)*2/1000;
+    dTemp = double((buffer[0] << 4) + temp)*2/1000.0;
     #ifdef PRINT_RAW
         cout << dec;
         cout << "Lattice PVCCINP Voltage  : " << dTemp << "V" <<endl;
