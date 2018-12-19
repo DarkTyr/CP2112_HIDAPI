@@ -17,7 +17,7 @@
 
 // If this is defined the script will print the raw values to console without 
 // interpertation or unit conversion
-#define PRINT_RAW
+//#define PRINT_RAW
 
 
 typedef struct emu_housekeeping_struct
@@ -38,7 +38,7 @@ typedef struct emu_housekeeping_struct
     double_t local_5p0_Iout;
     double_t local_9p0_Iout;
     double_t local_fan_Iout;
-};
+} housekeeping_struct;
 
 using namespace std;
 //int main(int argc, char *argv[])
@@ -111,6 +111,7 @@ int main()
 
     status = EMU->SMBus_configure();
     cout << "EMU i2c_configure result    : " << status << endl;
+    cout << endl;
 
     status = fan_ctrl->get_Temps(EMU, &temps_double, &temps_raw);
     #ifdef PRINT_RAW
@@ -159,7 +160,7 @@ int main()
     // Convert local current sense to Amps, returned voltage is in millivolts (mV)
     // 1V = 1A of current on the current sense, just need to convert to Volts
     emu_hskp.local_3p3_Iout = voltage_structure.Ch4.vout_double * 0.001;
-    emu_hskp.local_5p0_Iout = voltage_structure.Ch3.vout_double * 0.001 - emu_hskp.local_3p3_Iouit;
+    emu_hskp.local_5p0_Iout = voltage_structure.Ch3.vout_double * 0.001 - emu_hskp.local_3p3_Iout;
     emu_hskp.local_9p0_Iout = voltage_structure.Ch2.vout_double * 0.001 - emu_hskp.local_3p3_Iout - emu_hskp.local_5p0_Iout;
     emu_hskp.local_fan_Iout = voltage_structure.Ch5.vout_double * 0.001;
 
@@ -457,7 +458,7 @@ int main()
                     cout << " Pout = " << emu_hskp.D2_Vout * emu_hskp.D2_Iout << "W" << endl;
     cout << endl;
     cout << "___EMU Local Power Status___" << endl;
-    cout << " Sadly no voltage readout on local power supplies" << endl;
+    cout << " **Sadly no voltage readout on local power supplies**" << endl;
     cout << "Local 9V Vctrl :  Vin = " << emu_hskp.D5_Vin << "V" << "\t";
                     cout << " Vout = " << 9.00 << "V" << "\t";
                     cout << " Iout = " << emu_hskp.local_9p0_Iout << "A" << "\t";
@@ -471,6 +472,7 @@ int main()
                     cout << " Iout = " << emu_hskp.local_3p3_Iout << "A" << "\t";
                     cout << " Pout = " << 3.30 * emu_hskp.local_3p3_Iout << "W" << endl;
     cout << "     Local Fan :  Vin = " << emu_hskp.D5_Vin << "V" << "\t";
+                    cout << " Vout = " << emu_hskp.D5_Vin << "V" << "\t";
                     cout << " Iout = " << emu_hskp.local_fan_Iout << "A" << "\t";
                     cout << " Pout = " << 3.30 * emu_hskp.local_fan_Iout << "W" << endl;
 
