@@ -158,10 +158,10 @@ int main()
     #endif
     // Convert local current sense to Amps, returned voltage is in millivolts (mV)
     // 1V = 1A of current on the current sense, just need to convert to Volts
-    emu_hskp.local_3p3_Iout = voltage_structure.Ch4 * 0.001;
-    emu_hskp.local_5p0_Iout = voltage_structure.Ch3 * 0.001 - emu_hskp.local_3p3_I;
-    emu_hskp.local_9p0_Iout = voltage_structure.Ch2 * 0.001 - emu_hskp.local_3p3_I - emu_hskp.local_5p0_I;
-    emu_hskp.local_fan_Iout = voltage_structure.Ch5 * 0.001;
+    emu_hskp.local_3p3_Iout = voltage_structure.Ch4.vout_double * 0.001;
+    emu_hskp.local_5p0_Iout = voltage_structure.Ch3.vout_double * 0.001 - emu_hskp.local_3p3_Iouit;
+    emu_hskp.local_9p0_Iout = voltage_structure.Ch2.vout_double * 0.001 - emu_hskp.local_3p3_Iout - emu_hskp.local_5p0_Iout;
+    emu_hskp.local_fan_Iout = voltage_structure.Ch5.vout_double * 0.001;
 
 
 
